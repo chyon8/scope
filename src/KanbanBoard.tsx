@@ -28,6 +28,7 @@ function getAssigneeColor(assignee: string) {
 export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
   const [showModal, setShowModal] = useState(false)
   const [modalStep, setModalStep] = useState<1 | 2>(1)
   const [newProjectId, setNewProjectId] = useState('')
@@ -156,65 +157,145 @@ export default function KanbanBoard() {
           />
         </div>
 
-        <div className="kanban-header__actions">
+        <div className="kanban-header__actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', overflow: 'hidden' }}>
+            <button 
+              style={{ padding: '6px 12px', fontSize: '13px', background: viewMode === 'kanban' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'kanban' ? 'white' : 'var(--color-ink)', border: 'none', cursor: 'pointer' }}
+              onClick={() => setViewMode('kanban')}
+            >
+              🗂️ 칸반
+            </button>
+            <button 
+              style={{ padding: '6px 12px', fontSize: '13px', background: viewMode === 'list' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'list' ? 'white' : 'var(--color-ink)', border: 'none', cursor: 'pointer' }}
+              onClick={() => setViewMode('list')}
+            >
+              📋 리스트
+            </button>
+          </div>
           <button className="btn btn-primary" onClick={openModal}>새 프로젝트 등록</button>
         </div>
       </header>
       
-      <div className="kanban-columns">
-        {COLUMNS.map(col => {
-          const colProjects = filteredProjects.filter(p => 
-            col.id === 'closed' ? (p.status === 'won' || p.status === 'lost') : p.status === col.id
-          )
-          
-          return (
-            <div key={col.id} className="kanban-column">
-              <div className="kanban-column__header">
-                <h2 className="kanban-column__title">{col.title}</h2>
-                <span className="kanban-column__count">{colProjects.length}</span>
-              </div>
-              
-              <div className="kanban-column__list">
-                {colProjects.map(p => (
-                  <div 
-                    key={p.project_id} 
-                    className="kanban-card"
-                    onClick={() => navigate(`/project/${p.project_id}`)}
-                  >
-                    <div className="kanban-card__header" style={{ position: 'relative' }}>
-                      <span className="kanban-card__client">{p.client}</span>
-                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                        {p.status === 'won' && <span className="kanban-card__badge kanban-card__badge--won">계약 완료</span>}
-                        {p.status === 'lost' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
-                        <button 
-                          className="kanban-card__delete" 
-                          onClick={(e) => handleDeleteProject(e, p.project_id)}
-                          title="삭제"
+      {viewMode === 'kanban' ? (
+        <div className="kanban-columns">
+          {COLUMNS.map(col => {
+            const colProjects = filteredProjects.filter(p => 
+              col.id === 'closed' ? (p.status === 'won' || p.status === 'lost') : p.status === col.id
+            )
+            
+            return (
+              <div key={col.id} className="kanban-column">
+                <div className="kanban-column__header">
+                  <h2 className="kanban-column__title">{col.title}</h2>
+                  <span className="kanban-column__count">{colProjects.length}</span>
+                </div>
+                
+                <div className="kanban-column__list">
+                  {colProjects.map(p => (
+                    <div 
+                      key={p.project_id} 
+                      className="kanban-card"
+                      onClick={() => navigate(`/project/${p.project_id}`)}
+                    >
+                      <div className="kanban-card__header" style={{ position: 'relative' }}>
+                        <span className="kanban-card__client">{p.client}</span>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          {p.status === 'won' && <span className="kanban-card__badge kanban-card__badge--won">계약 완료</span>}
+                          {p.status === 'lost' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
+                          <button 
+                            className="kanban-card__delete" 
+                            onClick={(e) => handleDeleteProject(e, p.project_id)}
+                            title="삭제"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                      <h3 className="kanban-card__title">{p.title}</h3>
+                      <div className="kanban-card__footer">
+                        <span 
+                          className="kanban-card__assignee"
+                          style={{ backgroundColor: getAssigneeColor(p.assignee) }}
                         >
-                          ✕
-                        </button>
+                          {p.assignee}
+                        </span>
+                        <span className="kanban-card__date">{formatDate(p.updatedAt)} 업데이트</span>
                       </div>
                     </div>
-                    <h3 className="kanban-card__title">{p.title}</h3>
-                    <div className="kanban-card__footer">
-                      <span 
-                        className="kanban-card__assignee"
-                        style={{ backgroundColor: getAssigneeColor(p.assignee) }}
-                      >
+                  ))}
+                  {colProjects.length === 0 && (
+                    <div className="kanban-column__empty">프로젝트가 없습니다.</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="list-view-container" style={{ padding: '0 24px', flex: 1, overflowY: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--color-surface)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <thead style={{ backgroundColor: 'var(--color-canvas)', borderBottom: '1px solid var(--color-border)' }}>
+              <tr>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', color: 'var(--color-muted)', fontWeight: 600 }}>프로젝트명</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', color: 'var(--color-muted)', fontWeight: 600 }}>고객사</th>
+                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)', fontWeight: 600 }}>상태</th>
+                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)', fontWeight: 600 }}>담당자</th>
+                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)', fontWeight: 600 }}>업데이트</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProjects.map(p => {
+                const statusInfo = COLUMNS.find(c => c.id === p.status) || COLUMNS.find(c => c.id === 'closed')
+                return (
+                  <tr 
+                    key={p.project_id} 
+                    style={{ borderBottom: '1px solid var(--color-hairline)', cursor: 'pointer', transition: 'background-color 0.2s' }}
+                    onClick={() => navigate(`/project/${p.project_id}`)}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-canvas)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <td style={{ padding: '16px', fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)' }}>{p.title}</td>
+                    <td style={{ padding: '16px', fontSize: '13px', color: 'var(--color-body)' }}>{p.client}</td>
+                    <td style={{ padding: '16px', textAlign: 'center' }}>
+                      <span style={{ 
+                        display: 'inline-block',
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        fontSize: '12px', 
+                        fontWeight: 600,
+                        backgroundColor: p.status === 'won' ? 'rgba(80, 200, 120, 0.1)' : p.status === 'lost' ? 'rgba(231, 76, 60, 0.1)' : 'var(--color-canvas)',
+                        color: p.status === 'won' ? '#2e8b57' : p.status === 'lost' ? '#c0392b' : 'var(--color-ink)'
+                      }}>
+                        {p.status === 'won' ? '계약 완료' : p.status === 'lost' ? '취소' : statusInfo?.title}
+                      </span>
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'center' }}>
+                      <span style={{ 
+                        display: 'inline-block',
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        fontSize: '12px',
+                        color: 'white',
+                        backgroundColor: getAssigneeColor(p.assignee) 
+                      }}>
                         {p.assignee}
                       </span>
-                      <span className="kanban-card__date">{formatDate(p.updatedAt)} 업데이트</span>
-                    </div>
-                  </div>
-                ))}
-                {colProjects.length === 0 && (
-                  <div className="kanban-column__empty">프로젝트가 없습니다.</div>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)' }}>
+                      {formatDate(p.updatedAt)}
+                    </td>
+                  </tr>
+                )
+              })}
+              {filteredProjects.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--color-muted)' }}>프로젝트가 없습니다.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
