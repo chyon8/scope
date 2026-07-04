@@ -1,7 +1,7 @@
 import type { ProjectModel, TimelineEvent } from './types'
 
 export const mockProject: ProjectModel = {
-  project_id: 'proj_001',
+  project_id: '111111',
   org_id: 'org_01',
   title: 'TM CRM 앱 및 관리자 웹 신규 구축',
   client: '(주)한국통신영업',
@@ -90,7 +90,7 @@ export const mockProject: ProjectModel = {
 export const mockProjects: ProjectModel[] = [
   mockProject,
   {
-    project_id: 'proj_002',
+    project_id: '222222',
     org_id: 'org_01',
     title: '아이허브 제휴 연동 쿠폰 시스템',
     client: '약알(Yak-al)',
@@ -104,7 +104,7 @@ export const mockProjects: ProjectModel[] = [
     source_documents: []
   },
   {
-    project_id: 'proj_003',
+    project_id: '333333',
     org_id: 'org_01',
     title: '유저 테스트용 웹앱 프로토타입 제작',
     client: '스타트업 A',
@@ -118,7 +118,7 @@ export const mockProjects: ProjectModel[] = [
     source_documents: []
   },
   {
-    project_id: 'proj_004',
+    project_id: '444444',
     org_id: 'org_01',
     title: '요양병원 B2B 커머스 플랫폼',
     client: '(주)휴먼스코리아',
@@ -132,7 +132,7 @@ export const mockProjects: ProjectModel[] = [
     source_documents: []
   },
   {
-    project_id: 'proj_005',
+    project_id: '555555',
     org_id: 'org_01',
     title: '쇼핑몰 리뉴얼',
     client: '스타일브랜드',
