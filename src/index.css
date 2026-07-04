@@ -25,6 +25,7 @@
 
   /* ── Surface ── */
   --color-canvas: #faf9f5;
+  --color-surface: #ffffff;
   --color-surface-soft: #f5f0e8;
   --color-surface-card: #efe9de;
   --color-surface-cream-strong: #e8e0d2;
@@ -33,6 +34,7 @@
   --color-surface-dark-soft: #1f1e1b;
   --color-hairline: #e6dfd8;
   --color-hairline-soft: #ebe6df;
+  --color-border: #e6dfd8;
 
   /* ── Text ── */
   --color-ink: #141413;
@@ -83,6 +85,24 @@
   /* ── Transitions ── */
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
+}
+
+/* ─── Dark Theme ───────────────────────────────── */
+.dark-theme {
+  --color-canvas: var(--color-surface-dark);
+  --color-surface: var(--color-surface-dark-elevated);
+  --color-surface-soft: var(--color-surface-dark-soft);
+  --color-surface-card: var(--color-surface-dark-elevated);
+  --color-surface-cream-strong: #33302c;
+  --color-hairline: #33302c;
+  --color-hairline-soft: #252320;
+  --color-border: #33302c;
+
+  --color-ink: var(--color-on-dark);
+  --color-body-strong: #eae6e0;
+  --color-body: var(--color-on-dark-soft);
+  --color-muted: #8e8b82;
+  --color-muted-soft: #6c6a64;
 }
 
 /* ─── Base Styles ──────────────────────────────── */
