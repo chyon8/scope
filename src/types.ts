@@ -39,9 +39,11 @@ export interface ProjectModel {
   draft?: string
 }
 
-export interface InterviewMessage {
+export interface TimelineEvent {
   id: string
-  role: 'ai' | 'user'
-  content: string
+  type: 'document_upload' | 'audio_upload' | 'quick_memo' | 'ai_analysis'
+  title: string
+  description: string
   timestamp: string
+  impact?: string // e.g. "진행도 +40% 상승"
 }

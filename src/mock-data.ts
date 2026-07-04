@@ -1,4 +1,4 @@
-import type { ProjectModel, InterviewMessage } from './types'
+import type { ProjectModel, TimelineEvent } from './types'
 
 export const mockProject: ProjectModel = {
   project_id: 'proj_001',
@@ -83,17 +83,35 @@ export const mockProject: ProjectModel = {
 - 일정: (확인 필요)`
 }
 
-export const mockMessages: InterviewMessage[] = [
+export const mockTimelineEvents: TimelineEvent[] = [
   {
-    id: 'msg_001',
-    role: 'ai',
-    content: '안녕하세요! 업로드해주신 TM CRM 요구사항 문서를 분석했습니다.\n\n현재 공고 작성 가능 수준은 **68%**입니다. 서비스 개요와 핵심 기능(CRM, AI STT, 통화 녹취 등)은 파악되었습니다.\n\n하지만 명확한 공고 작성을 위해 몇 가지 확인이 필요합니다.',
-    timestamp: '2026-07-04T10:10:00Z',
+    id: 'evt_001',
+    type: 'document_upload',
+    title: 'TM_CRM_요구사항_초안.pdf 업로드 됨',
+    description: '초기 요구사항 문서가 시스템에 등록되었습니다.',
+    timestamp: '2026-07-04T09:00:00Z',
   },
   {
-    id: 'msg_002',
-    role: 'ai',
-    content: '**관리자 페이지도 함께 구축**해야 하나요?\n\n이 여부에 따라 전체적인 개발 범위와 견적이 크게 달라질 수 있습니다.',
-    timestamp: '2026-07-04T10:10:05Z',
+    id: 'evt_002',
+    type: 'ai_analysis',
+    title: 'AI 초기 문서 분석 완료',
+    description: '핵심 기능(CRM, AI STT, 통화 녹취)을 파악했습니다. 누락된 필수 정보 6건을 발견했습니다.',
+    timestamp: '2026-07-04T09:00:15Z',
+    impact: '진행도 40% 달성',
+  },
+  {
+    id: 'evt_003',
+    type: 'audio_upload',
+    title: '1차 킥오프 통화.mp3 업로드 됨',
+    description: '고객과의 1차 유선 미팅 녹취 파일이 등록되었습니다.',
+    timestamp: '2026-07-04T10:15:00Z',
+  },
+  {
+    id: 'evt_004',
+    type: 'ai_analysis',
+    title: '통화 녹취 분석 완료',
+    description: '관리자 권한 상세 내용 및 기존 시스템 유무가 확인되어 공고문에 반영되었습니다.',
+    timestamp: '2026-07-04T10:16:30Z',
+    impact: '진행도 68% 달성',
   },
 ]

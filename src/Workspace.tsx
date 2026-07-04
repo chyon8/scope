@@ -1,28 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { mockProject, mockMessages } from './mock-data'
-import type { ProjectModel, InterviewMessage } from './types'
+import { mockProject, mockTimelineEvents } from './mock-data'
+import type { ProjectModel, TimelineEvent } from './types'
 import './Workspace.css'
 
 function getStatusLabel(status: ProjectModel['status']): string {
   switch (status) {
     case 'collecting': return '자료 수집 중'
-    case 'interviewing': return '인터뷰 진행 중'
+    case 'interviewing': return '정보 갱신 중'
     case 'ready_for_output': return '산출물 준비 완료'
   }
-}
-
-function renderMessageContent(content: string) {
-  const parts = content.split('\n')
-  return parts.map((line, i) => {
-    if (line.trim() === '') return <br key={i} />
-    const rendered = line.split(/(\*\*[^*]+\*\*)/).map((segment, j) => {
-      if (segment.startsWith('**') && segment.endsWith('**')) {
-        return <strong key={j}>{segment.slice(2, -2)}</strong>
-      }
-      return segment
-    })
-    return <p key={i}>{rendered}</p>
-  })
 }
 
 function formatTime(iso: string): string {
@@ -46,20 +32,31 @@ function renderStars(priority: number) {
   return '★'.repeat(priority) + '☆'.repeat(5 - priority)
 }
 
+function getEventIcon(type: TimelineEvent['type']) {
+  switch (type) {
+    case 'document_upload': return '📄'
+    case 'audio_upload': return '🎧'
+    case 'quick_memo': return '📝'
+    case 'ai_analysis': return '✨'
+    default: return '📎'
+  }
+}
+
 export default function Workspace() {
   const [project, setProject] = useState<ProjectModel>(() => ({ ...mockProject }))
-  const [messages, setMessages] = useState<InterviewMessage[]>(() => [...mockMessages])
-  const [inputValue, setInputValue] = useState('')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [events, setEvents] = useState<TimelineEvent[]>(() => [...mockTimelineEvents])
+  const [memoValue, setMemoValue] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+  const feedEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    feedEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, scrollToBottom])
+  }, [events, scrollToBottom])
 
   useEffect(() => {
     const ta = textareaRef.current
@@ -67,59 +64,90 @@ export default function Workspace() {
       ta.style.height = 'auto'
       ta.style.height = Math.min(ta.scrollHeight, 160) + 'px'
     }
-  }, [inputValue])
+  }, [memoValue])
 
-  function handleSend() {
-    const text = inputValue.trim()
+  function handleAddMemo() {
+    const text = memoValue.trim()
     if (!text) return
 
     const now = new Date().toISOString()
-    const userMsg: InterviewMessage = {
-      id: `msg_${Date.now()}`,
-      role: 'user',
-      content: text,
+    const memoEvent: TimelineEvent = {
+      id: `evt_${Date.now()}`,
+      type: 'quick_memo',
+      title: '빠른 메모 추가됨',
+      description: text,
       timestamp: now,
     }
-    setMessages(prev => [...prev, userMsg])
-    setInputValue('')
+    setEvents(prev => [...prev, memoEvent])
+    setMemoValue('')
 
     // Mock completion increase
-    setProject(prev => {
-      const next = { ...prev }
-      next.completion = Math.min(100, next.completion + 12)
-      if (next.completion >= 100) {
-        next.status = 'ready_for_output'
-      }
-      
-      // Remove the top missing info
-      if (next.missing.length > 0) {
-        next.missing = [...next.missing.slice(1)]
-      }
-      
-      // Update detected info mock
-      next.detected = {
-        ...next.detected,
-        "추가 확인 사항": "업데이트 됨",
-      }
+    triggerMockAnalysis()
+  }
 
-      return next
-    })
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    setIsDragging(true)
+  }
 
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setIsDragging(false)
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
+
+    const now = new Date().toISOString()
+    const fileEvent: TimelineEvent = {
+      id: `evt_${Date.now()}`,
+      type: files[0].type.includes('audio') ? 'audio_upload' : 'document_upload',
+      title: `${files[0].name} 업로드 됨`,
+      description: '새로운 소스 파일이 시스템에 등록되었습니다.',
+      timestamp: now,
+    }
+    setEvents(prev => [...prev, fileEvent])
+
+    triggerMockAnalysis()
+  }
+
+  function triggerMockAnalysis() {
     setTimeout(() => {
-      const aiMsg: InterviewMessage = {
-        id: `msg_${Date.now() + 1}`,
-        role: 'ai',
-        content: `감사합니다. 답변을 바탕으로 공고 내용을 업데이트했습니다.\n\n다음으로 궁금한 점이 있습니다. 디자인도 함께 진행하시나요?`,
+      setProject(prev => {
+        const next = { ...prev }
+        next.completion = Math.min(100, next.completion + 15)
+        if (next.completion >= 100) {
+          next.status = 'ready_for_output'
+        }
+        if (next.missing.length > 0) {
+          next.missing = [...next.missing.slice(1)]
+        }
+        next.detected = {
+          ...next.detected,
+          "추가 정보": "방금 입력된 내용 반영됨",
+        }
+        return next
+      })
+
+      const aiEvent: TimelineEvent = {
+        id: `evt_${Date.now() + 1}`,
+        type: 'ai_analysis',
+        title: '신규 소스 분석 완료',
+        description: '입력된 정보를 바탕으로 대시보드와 공고문을 업데이트했습니다.',
         timestamp: new Date().toISOString(),
+        impact: `진행도 상승`,
       }
-      setMessages(prev => [...prev, aiMsg])
-    }, 1000)
+      setEvents(prev => [...prev, aiEvent])
+    }, 1200)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSend()
+      handleAddMemo()
     }
   }
 
@@ -206,7 +234,7 @@ export default function Workspace() {
 
         {/* Recommended Questions */}
         <div className="sidebar__section">
-          <h2 className="sidebar__heading">추천 질문 (가장 중요)</h2>
+          <h2 className="sidebar__heading">추천 질문 (통화 전 체크리스트)</h2>
           <div className="question-list">
             {project.recommendedQuestions.map((q, idx) => (
               <div key={idx} className="question-card">
@@ -224,48 +252,66 @@ export default function Workspace() {
         </div>
       </aside>
 
-      {/* ── Chat Panel ── */}
-      <div className="chat-panel">
-        <div className="chat-messages">
-          {messages.map(msg => (
-            <div key={msg.id} className={`message message--${msg.role}`}>
-              <div className="message__avatar">
-                {msg.role === 'ai' ? 'AI' : 'U'}
+      {/* ── Center Panel (Timeline & Dropzone) ── */}
+      <div className="timeline-panel">
+        <div className="timeline-feed">
+          {events.map((evt) => (
+            <div key={evt.id} className={`timeline-event timeline-event--${evt.type}`}>
+              <div className="timeline-event__icon">
+                {getEventIcon(evt.type)}
               </div>
-              <div>
-                <div className="message__bubble">
-                  {renderMessageContent(msg.content)}
+              <div className="timeline-event__content">
+                <div className="timeline-event__header">
+                  <h3 className="timeline-event__title">{evt.title}</h3>
+                  <span className="timeline-event__time">{formatTime(evt.timestamp)}</span>
                 </div>
-                <div className="message__time">{formatTime(msg.timestamp)}</div>
+                <p className="timeline-event__desc">{evt.description}</p>
+                {evt.impact && (
+                  <div className="timeline-event__impact">{evt.impact}</div>
+                )}
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} />
+          <div ref={feedEndRef} />
         </div>
 
-        <div className="chat-input-area">
-          <div className="chat-input-wrapper">
-            <textarea
-              ref={textareaRef}
-              className="chat-input"
-              placeholder="답변을 입력하세요... (Shift+Enter로 줄바꿈)"
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-            />
-            <button
-              className="chat-send-btn"
-              type="button"
-              onClick={handleSend}
-              disabled={!inputValue.trim()}
-              aria-label="전송"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
+        <div className="input-zone">
+          <div 
+            className={`dropzone ${isDragging ? 'dropzone--dragging' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="dropzone__icon">📥</div>
+            <div className="dropzone__text">
+              <strong>통화 녹취록</strong> 또는 <strong>요구사항 문서</strong>를 이곳에 끌어다 놓으세요.
+            </div>
+            <div className="dropzone__subtext">지원 포맷: txt, mp3, pdf, docx 등</div>
+          </div>
+          
+          <div className="quick-memo">
+            <div className="quick-memo__wrapper">
+              <textarea
+                ref={textareaRef}
+                className="quick-memo__input"
+                placeholder="또는 짧은 텍스트 메모를 직접 입력하세요..."
+                value={memoValue}
+                onChange={e => setMemoValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={1}
+              />
+              <button
+                className="quick-memo__btn"
+                type="button"
+                onClick={handleAddMemo}
+                disabled={!memoValue.trim()}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
