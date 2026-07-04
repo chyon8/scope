@@ -146,10 +146,6 @@ export default function KanbanBoard() {
                 <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>고객사</label>
-                <input required value={newClient} onChange={e => setNewClient(e.target.value)} />
-              </div>
-              <div className="form-group">
                 <label>담당자</label>
                 <select value={newAssignee} onChange={e => setNewAssignee(e.target.value as any)}>
                   <option value="미지정">미지정</option>

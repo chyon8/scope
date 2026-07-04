@@ -14,7 +14,7 @@ function App() {
           <a
             href="/"
             className="top-nav__brand"
-            onClick={e => { e.preventDefault(); setPage('workspace') }}
+            onClick={e => { e.preventDefault(); navigate('/') }}
           >
             <svg className="top-nav__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
@@ -22,11 +22,6 @@ function App() {
             </svg>
             <span className="top-nav__name">Project Detective</span>
           </a>
-          <div className="top-nav__actions">
-            <button className="btn btn-primary" type="button">
-              새 프로젝트
-            </button>
-          </div>
         </div>
       </nav>
 
