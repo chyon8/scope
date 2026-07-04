@@ -7,7 +7,7 @@
 .workspace {
   display: grid;
   grid-template-columns: 360px 1fr 340px;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   height: calc(100vh - var(--nav-height));
   overflow: hidden;
 }
@@ -21,7 +21,37 @@
   justify-content: space-between;
   padding: var(--space-md) var(--space-lg);
   background-color: var(--color-canvas);
+}
+
+.workspace-tabs {
+  grid-column: 1 / -1;
+  display: flex;
+  padding: 0 var(--space-lg);
+  gap: var(--space-xl);
   border-bottom: 1px solid var(--color-hairline);
+  background-color: var(--color-canvas);
+}
+
+.workspace-tab {
+  padding: var(--space-sm) 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.workspace-tab:hover {
+  color: var(--color-ink);
+}
+
+.workspace-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
 }
 
 .project-header__left {
@@ -562,6 +592,32 @@
   color: var(--color-body-strong);
   white-space: pre-wrap;
   word-break: keep-all;
+}
+
+/* ─── Empty Tab View Placeholder ─────────────────────────────── */
+
+.empty-tab-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--rounded-lg);
+  margin: var(--space-xl);
+  color: var(--color-muted);
+}
+
+.empty-tab-view h2 {
+  font-size: 18px;
+  color: var(--color-ink);
+  margin-bottom: var(--space-sm);
+}
+
+.empty-tab-view p {
+  font-size: 14px;
 }
 
 /* ─── Responsive ───────────────────────────────── */

@@ -54,6 +54,7 @@ export default function Workspace() {
   const [events, setEvents] = useState<TimelineEvent[]>([])
   const [memoValue, setMemoValue] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  const [activeTab, setActiveTab] = useState<'inspection' | 'recruitment' | 'progress' | 'completion'>('inspection')
   
   const feedEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -213,8 +214,17 @@ export default function Workspace() {
         </div>
       </header>
 
-      {/* ── Sidebar (Dashboard) ── */}
-      <aside className="sidebar">
+      {/* ── Tab Navigation ── */}
+      <nav className="workspace-tabs">
+        <button className={`workspace-tab ${activeTab === 'inspection' ? 'workspace-tab--active' : ''}`} onClick={() => setActiveTab('inspection')}>검수 및 기획</button>
+        <button className={`workspace-tab ${activeTab === 'recruitment' ? 'workspace-tab--active' : ''}`} onClick={() => setActiveTab('recruitment')}>모집 및 후보</button>
+        <button className={`workspace-tab ${activeTab === 'progress' ? 'workspace-tab--active' : ''}`} onClick={() => setActiveTab('progress')}>계약 및 진행</button>
+        <button className={`workspace-tab ${activeTab === 'completion' ? 'workspace-tab--active' : ''}`} onClick={() => setActiveTab('completion')}>사후 리뷰</button>
+      </nav>
+
+      {/* ── Sidebar (Left Panel) ── */}
+      {activeTab === 'inspection' ? (
+        <aside className="sidebar">
         {/* Progress Bar */}
         <div className="sidebar__section dashboard-progress">
           <div className="dashboard-progress__header">
@@ -303,8 +313,30 @@ export default function Workspace() {
           </div>
         </div>
       </aside>
+      ) : activeTab === 'recruitment' ? (
+        <aside className="sidebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="empty-tab-view">
+            <h2>모집 및 후보 검토</h2>
+            <p>지원한 개발사 리스트와 후보 미팅 녹취 요약 기능이 들어갈 자리입니다.</p>
+          </div>
+        </aside>
+      ) : activeTab === 'progress' ? (
+        <aside className="sidebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="empty-tab-view">
+            <h2>진행 트래킹</h2>
+            <p>스코프 변경, 예산 증액, 중도 취소 사유를 기록하는 기능이 들어갈 자리입니다.</p>
+          </div>
+        </aside>
+      ) : (
+        <aside className="sidebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="empty-tab-view">
+            <h2>사후 리뷰 및 자산화</h2>
+            <p>최종 코멘트를 남기고 과거 데이터와 연동하여 유사 사례 DB를 구축하는 자리입니다.</p>
+          </div>
+        </aside>
+      )}
 
-      {/* ── Center Panel (Timeline & Dropzone) ── */}
+      {/* ── Main Feed (Timeline) ── */}
       <div className="timeline-panel">
         <div className="timeline-feed">
           {events.length === 0 ? (
@@ -381,8 +413,9 @@ export default function Workspace() {
         </div>
       </div>
 
-      {/* ── Preview Panel ── */}
-      <aside className="preview-panel">
+      {/* ── Preview Panel (Right Panel) ── */}
+      {activeTab === 'inspection' ? (
+        <aside className="preview-panel">
         <div className="preview-panel__header">
           <h2 className="preview-panel__heading">공고 미리보기 (초안)</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -413,6 +446,13 @@ export default function Workspace() {
           </pre>
         </div>
       </aside>
+      ) : (
+        <aside className="preview-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-surface)' }}>
+          <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
+            <p style={{ color: 'var(--color-muted)' }}>현재 탭에서는 공고 미리보기가 비활성화됩니다.</p>
+          </div>
+        </aside>
+      )}
     </div>
   )
 }
