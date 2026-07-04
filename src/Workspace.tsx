@@ -360,7 +360,27 @@ export default function Workspace() {
       <aside className="preview-panel">
         <div className="preview-panel__header">
           <h2 className="preview-panel__heading">공고 미리보기 (초안)</h2>
-          <span className="preview-panel__status">실시간 업데이트 중</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="preview-panel__status">실시간 업데이트 중</span>
+            {project.draft && (
+              <button
+                className="btn btn-secondary"
+                type="button"
+                style={{ fontSize: '12px', padding: '4px 10px' }}
+                onClick={() => {
+                  navigator.clipboard.writeText(project.draft || '')
+                  const btn = document.getElementById('copy-btn')
+                  if (btn) {
+                    btn.textContent = '✅ 복사됨!'
+                    setTimeout(() => { btn.textContent = '📋 복사하기' }, 2000)
+                  }
+                }}
+                id="copy-btn"
+              >
+                📋 복사하기
+              </button>
+            )}
+          </div>
         </div>
         <div className="preview-panel__content">
           <pre className="preview-panel__text">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { ProjectModel, ProjectStatus } from './types'
 import './KanbanBoard.css'
@@ -29,9 +29,13 @@ export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [modalStep, setModalStep] = useState<1 | 2>(1)
   const [newTitle, setNewTitle] = useState('')
-  const [newClient, setNewClient] = useState('')
   const [newAssignee, setNewAssignee] = useState<'장수룡' | '이상민' | '김세민' | '미지정'>('미지정')
+  const [initialText, setInitialText] = useState('')
+  const [initialFiles, setInitialFiles] = useState<File[]>([])
+  const [isCreating, setIsCreating] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const navigate = useNavigate()
 
@@ -49,20 +53,67 @@ export default function KanbanBoard() {
     fetchProjects()
   }, [])
 
-  const handleCreateProject = async (e: React.FormEvent) => {
+  const openModal = () => {
+    setShowModal(true)
+    setModalStep(1)
+    setNewTitle('')
+    setNewAssignee('미지정')
+    setInitialText('')
+    setInitialFiles([])
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setModalStep(1)
+  }
+
+  const handleStep1Next = (e: React.FormEvent) => {
     e.preventDefault()
+    setModalStep(2)
+  }
+
+  const handleCreateProject = async () => {
+    if (!initialText.trim()) return
+    setIsCreating(true)
+
     try {
-      const res = await fetch('http://localhost:3001/api/projects', {
+      // 1. Create the project
+      const createRes = await fetch('http://localhost:3001/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, client: newClient, assignee: newAssignee })
+        body: JSON.stringify({ title: newTitle, assignee: newAssignee })
       })
-      const newProj = await res.json()
-      setShowModal(false)
+      const newProj = await createRes.json()
+
+      // 2. Send initial requirements text (+ files) to upload endpoint
+      const formData = new FormData()
+      formData.append('text', initialText)
+      initialFiles.forEach(f => formData.append('file', f))
+
+      await fetch(`http://localhost:3001/api/projects/${newProj.project_id}/upload`, {
+        method: 'POST',
+        body: formData
+      })
+
+      closeModal()
       navigate(`/project/${newProj.project_id}`)
     } catch (e) {
       console.error("Failed to create project", e)
+    } finally {
+      setIsCreating(false)
     }
+  }
+
+  const handleFileAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      setInitialFiles(prev => [...prev, ...Array.from(files)])
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const removeFile = (index: number) => {
+    setInitialFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   const filteredProjects = projects.filter(p => 
@@ -86,7 +137,7 @@ export default function KanbanBoard() {
         </div>
 
         <div className="kanban-header__actions">
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>새 프로젝트 등록</button>
+          <button className="btn btn-primary" onClick={openModal}>새 프로젝트 등록</button>
         </div>
       </header>
       
@@ -137,28 +188,111 @@ export default function KanbanBoard() {
       </div>
 
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>새 프로젝트 등록</h2>
-            <form onSubmit={handleCreateProject}>
-              <div className="form-group">
-                <label>프로젝트명</label>
-                <input required value={newTitle} onChange={e => setNewTitle(e.target.value)} />
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content modal-content--wide" onClick={e => e.stopPropagation()}>
+            
+            {/* Step indicator */}
+            <div className="modal-steps">
+              <div className={`modal-step ${modalStep >= 1 ? 'modal-step--active' : ''}`}>
+                <span className="modal-step__number">1</span>
+                <span className="modal-step__label">기본 정보</span>
               </div>
-              <div className="form-group">
-                <label>담당자</label>
-                <select value={newAssignee} onChange={e => setNewAssignee(e.target.value as any)}>
-                  <option value="미지정">미지정</option>
-                  <option value="장수룡">장수룡</option>
-                  <option value="이상민">이상민</option>
-                  <option value="김세민">김세민</option>
-                </select>
+              <div className="modal-step__line" />
+              <div className={`modal-step ${modalStep >= 2 ? 'modal-step--active' : ''}`}>
+                <span className="modal-step__number">2</span>
+                <span className="modal-step__label">초기 요구사항</span>
               </div>
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>취소</button>
-                <button type="submit" className="btn btn-primary">생성하기</button>
+            </div>
+
+            {modalStep === 1 ? (
+              <form onSubmit={handleStep1Next}>
+                <h2>새 프로젝트 등록</h2>
+                <div className="form-group">
+                  <label>프로젝트명</label>
+                  <input 
+                    required 
+                    value={newTitle} 
+                    onChange={e => setNewTitle(e.target.value)} 
+                    placeholder="예: TM CRM 앱 신규 구축"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>담당자</label>
+                  <select value={newAssignee} onChange={e => setNewAssignee(e.target.value as any)}>
+                    <option value="미지정">미지정</option>
+                    <option value="장수룡">장수룡</option>
+                    <option value="이상민">이상민</option>
+                    <option value="김세민">김세민</option>
+                  </select>
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn btn-secondary" onClick={closeModal}>취소</button>
+                  <button type="submit" className="btn btn-primary">다음 →</button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                <h2>초기 요구사항 입력</h2>
+                <p className="modal-desc">고객이 보낸 카톡, 이메일, 통화 메모 등 러프한 내용을 그대로 붙여넣으세요.<br/>AI가 분석하여 즉시 대시보드를 채워드립니다.</p>
+                
+                <div className="form-group">
+                  <label>요구사항 텍스트 <span className="form-required">*필수</span></label>
+                  <textarea
+                    className="modal-textarea"
+                    value={initialText}
+                    onChange={e => setInitialText(e.target.value)}
+                    placeholder={"예시:\n고객사: ○○기업\n모바일 앱으로 CRM 만들고 싶은데 직원 250명 쓸 수 있어야 하고,\n인터넷 전화 기능이랑 통화 녹음 기능 필요합니다.\n관리자 페이지도 있어야 하고요..."}
+                    rows={8}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>파일 첨부 <span className="form-optional">(선택)</span></label>
+                  <div 
+                    className="modal-file-area"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      onChange={handleFileAdd}
+                      multiple
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp3,.wav,.m4a,.jpg,.png"
+                    />
+                    <span className="modal-file-area__icon">📎</span>
+                    <span className="modal-file-area__text">클릭하여 파일 추가 (PDF, Word, Excel, PPT, 녹취 등)</span>
+                  </div>
+                  {initialFiles.length > 0 && (
+                    <div className="modal-file-list">
+                      {initialFiles.map((f, i) => (
+                        <div key={i} className="modal-file-item">
+                          <span className="modal-file-item__name">{f.name}</span>
+                          <button 
+                            type="button" 
+                            className="modal-file-item__remove" 
+                            onClick={() => removeFile(i)}
+                          >×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="btn btn-secondary" onClick={() => setModalStep(1)}>← 이전</button>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary" 
+                    onClick={handleCreateProject}
+                    disabled={!initialText.trim() || isCreating}
+                  >
+                    {isCreating ? '생성 중...' : '프로젝트 시작하기'}
+                  </button>
+                </div>
               </div>
-            </form>
+            )}
+
           </div>
         </div>
       )}

@@ -1,6 +1,99 @@
 {
   "projects": [
     {
+      "project_id": "proj_1783152010930",
+      "org_id": "org_01",
+      "title": "ㄴㄴㅇ",
+      "client": "미정",
+      "assignee": "미지정",
+      "updatedAt": "2026-07-04T08:00:10.946Z",
+      "status": "new",
+      "completion": 15,
+      "detected": {},
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": [
+        {
+          "id": "evt_1783152010946",
+          "type": "quick_memo",
+          "title": "텍스트 메모 추가됨",
+          "description": "프로젝트 개요\r\n아이허브(iHerb) 제휴 연동을 기반으로 한 쿠폰(프로모션 할인코드) 관리 기능 추가 및 약알 웹페이지 영문 번역 작업입니다. 아이허브에서 제공하는 프로모션 할인...",
+          "timestamp": "2026-07-04T08:00:10.946Z"
+        },
+        {
+          "id": "evt_ai_1783152010946",
+          "type": "ai_analysis",
+          "title": "AI 분석 시뮬레이션",
+          "description": "OPENAI_API_KEY가 없어 Mock 업데이트 되었습니다.",
+          "timestamp": "2026-07-04T08:00:10.946Z"
+        }
+      ],
+      "draft": ""
+    },
+    {
+      "project_id": "proj_1783151958037",
+      "org_id": "org_01",
+      "title": "ㄷㄷㄷㄷ",
+      "client": "미정",
+      "assignee": "이상민",
+      "updatedAt": "2026-07-04T07:59:18.044Z",
+      "status": "new",
+      "completion": 15,
+      "detected": {},
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": [
+        {
+          "id": "evt_1783151958044",
+          "type": "quick_memo",
+          "title": "텍스트 메모 추가됨",
+          "description": "프로젝트 개요\r\n아이허브(iHerb) 제휴 연동을 기반으로 한 쿠폰(프로모션 할인코드) 관리 기능 추가 및 약알 웹페이지 영문 번역 작업입니다. 아이허브에서 제공하는 프로모션 할인...",
+          "timestamp": "2026-07-04T07:59:18.044Z"
+        },
+        {
+          "id": "evt_ai_1783151958044",
+          "type": "ai_analysis",
+          "title": "AI 분석 시뮬레이션",
+          "description": "OPENAI_API_KEY가 없어 Mock 업데이트 되었습니다.",
+          "timestamp": "2026-07-04T07:59:18.044Z"
+        }
+      ],
+      "draft": ""
+    },
+    {
+      "project_id": "proj_1783151196905",
+      "org_id": "org_01",
+      "title": "테스트",
+      "client": "미정",
+      "assignee": "이상민",
+      "updatedAt": "2026-07-04T07:46:36.917Z",
+      "status": "new",
+      "completion": 15,
+      "detected": {},
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": [
+        {
+          "id": "evt_1783151196917",
+          "type": "quick_memo",
+          "title": "텍스트 메모 추가됨",
+          "description": "프로젝트 개요\r\n아이허브(iHerb) 제휴 연동을 기반으로 한 쿠폰(프로모션 할인코드) 관리 기능 추가 및 약알 웹페이지 영문 번역 작업입니다. 아이허브에서 제공하는 프로모션 할인...",
+          "timestamp": "2026-07-04T07:46:36.917Z"
+        },
+        {
+          "id": "evt_ai_1783151196917",
+          "type": "ai_analysis",
+          "title": "AI 분석 시뮬레이션",
+          "description": "OPENAI_API_KEY가 없어 Mock 업데이트 되었습니다.",
+          "timestamp": "2026-07-04T07:46:36.917Z"
+        }
+      ],
+      "draft": ""
+    },
+    {
       "project_id": "proj_1783149177931",
       "org_id": "org_01",
       "title": "테스트",
