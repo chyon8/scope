@@ -269,17 +269,7 @@ export default function Workspace() {
             ←
           </button>
           <h1 className="project-header__title">{project.title}</h1>
-          <select 
-            className={`project-header__status project-header__status--${project.status}`}
-            value={project.status}
-            onChange={handleStatusChange}
-          >
-            <option value="new">신규 문의</option>
-            <option value="interviewing">상담 및 정보 수집</option>
-            <option value="ready">모집 중 (공고 완성)</option>
-            <option value="won">계약 완료</option>
-            <option value="lost">취소/보류</option>
-          </select>
+
         </div>
         <div className="project-header__right">
           <button className="btn btn-secondary" type="button">

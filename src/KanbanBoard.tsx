@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import type { ProjectModel, ProjectStatus } from './types'
 import './KanbanBoard.css'
 
-const COLUMNS: { id: ProjectStatus | 'closed', title: string }[] = [
-  { id: 'new', title: '신규 문의' },
-  { id: 'interviewing', title: '상담 및 정보 수집' },
-  { id: 'ready', title: '모집 (공고 완성)' },
-  { id: 'closed', title: '계약 / 취소' },
+const COLUMNS: { id: ProjectStatus, title: string }[] = [
+  { id: 'inspection', title: '검수' },
+  { id: 'recruiting', title: '모집' },
+  { id: 'contracting', title: '계약' },
+  { id: 'completed', title: '완료' },
+  { id: 'cancelled', title: '취소' },
 ]
 
 function formatDate(iso: string) {
@@ -179,9 +180,7 @@ export default function KanbanBoard() {
       {viewMode === 'kanban' ? (
         <div className="kanban-columns">
           {COLUMNS.map(col => {
-            const colProjects = filteredProjects.filter(p => 
-              col.id === 'closed' ? (p.status === 'won' || p.status === 'lost') : p.status === col.id
-            )
+            const colProjects = filteredProjects.filter(p => p.status === col.id)
             
             return (
               <div key={col.id} className="kanban-column">
@@ -200,8 +199,8 @@ export default function KanbanBoard() {
                       <div className="kanban-card__header" style={{ position: 'relative' }}>
                         <span className="kanban-card__client">{p.client}</span>
                         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                          {p.status === 'won' && <span className="kanban-card__badge kanban-card__badge--won">계약 완료</span>}
-                          {p.status === 'lost' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
+                          {p.status === 'completed' && <span className="kanban-card__badge kanban-card__badge--won">완료</span>}
+                          {p.status === 'cancelled' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
                           <button 
                             className="kanban-card__delete" 
                             onClick={(e) => handleDeleteProject(e, p.project_id)}
@@ -245,7 +244,7 @@ export default function KanbanBoard() {
             </thead>
             <tbody>
               {filteredProjects.map(p => {
-                const statusInfo = COLUMNS.find(c => c.id === p.status) || COLUMNS.find(c => c.id === 'closed')
+                const statusInfo = COLUMNS.find(c => c.id === p.status)
                 return (
                   <tr 
                     key={p.project_id} 
@@ -263,10 +262,10 @@ export default function KanbanBoard() {
                         borderRadius: '4px', 
                         fontSize: '12px', 
                         fontWeight: 600,
-                        backgroundColor: p.status === 'won' ? 'rgba(80, 200, 120, 0.1)' : p.status === 'lost' ? 'rgba(231, 76, 60, 0.1)' : 'var(--color-canvas)',
-                        color: p.status === 'won' ? '#2e8b57' : p.status === 'lost' ? '#c0392b' : 'var(--color-ink)'
+                        backgroundColor: p.status === 'completed' ? 'rgba(80, 200, 120, 0.1)' : p.status === 'cancelled' ? 'rgba(231, 76, 60, 0.1)' : 'var(--color-canvas)',
+                        color: p.status === 'completed' ? '#2e8b57' : p.status === 'cancelled' ? '#c0392b' : 'var(--color-ink)'
                       }}>
-                        {p.status === 'won' ? '계약 완료' : p.status === 'lost' ? '취소' : statusInfo?.title}
+                        {statusInfo?.title}
                       </span>
                     </td>
                     <td style={{ padding: '16px', textAlign: 'center' }}>
@@ -294,6 +293,38 @@ export default function KanbanBoard() {
               )}
             </tbody>
           </table>
+
+          <div style={{ marginTop: '32px', marginBottom: '32px', backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <span style={{ color: 'var(--color-primary)' }}>✦</span>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', margin: 0 }}>AI 유사사례 제안</h3>
+              <span style={{ fontSize: '12px', color: 'var(--color-muted)', marginLeft: '4px' }}>키워드 검색과 별도로 AI가 추가 제안</span>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', backgroundColor: 'var(--color-canvas)', borderRadius: '6px', border: '1px solid var(--color-hairline)' }}>
+                <div style={{ fontSize: '14px', color: 'var(--color-ink)' }}>
+                  <span style={{ fontWeight: 600 }}>▽▽제조 고객상담봇 구축</span>
+                  <span style={{ color: 'var(--color-muted)', margin: '0 8px' }}>—</span>
+                  <span style={{ color: '#2e8b57', fontWeight: 500 }}>완료(성공)</span>
+                  <span style={{ color: 'var(--color-muted)', margin: '0 8px' }}>—</span>
+                  <span style={{ color: 'var(--color-muted)' }}>2025</span>
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)' }}>유사도 92%</div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', backgroundColor: 'var(--color-canvas)', borderRadius: '6px', border: '1px solid var(--color-hairline)' }}>
+                <div style={{ fontSize: '14px', color: 'var(--color-ink)' }}>
+                  <span style={{ fontWeight: 600 }}>☆☆금융 FAQ봇</span>
+                  <span style={{ color: 'var(--color-muted)', margin: '0 8px' }}>—</span>
+                  <span style={{ color: '#c0392b', fontWeight: 500 }}>완료(취소)</span>
+                  <span style={{ color: 'var(--color-muted)', margin: '0 8px' }}>—</span>
+                  <span style={{ color: 'var(--color-muted)' }}>2024</span>
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)' }}>유사도 85%</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

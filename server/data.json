@@ -7,7 +7,7 @@
       "client": "아이젠소프트",
       "assignee": "이상민",
       "updatedAt": "2026-07-04T12:14:24.703Z",
-      "status": "interviewing",
+      "status": "inspection",
       "completion": 100,
       "detected": {
         "budget": "5,000만원",
@@ -45,7 +45,7 @@
       "client": "미정",
       "assignee": "미지정",
       "updatedAt": "2026-07-04T11:14:41.125Z",
-      "status": "interviewing",
+      "status": "inspection",
       "completion": 25,
       "detected": {
         "projectOverview": "TM CRM 앱 개발",
@@ -140,7 +140,7 @@
       "client": "(주)한국통신영업",
       "assignee": "장수룡",
       "updatedAt": "2026-07-04T10:16:30Z",
-      "status": "interviewing",
+      "status": "inspection",
       "completion": 68,
       "detected": {
         "service": "CRM 앱",
@@ -231,7 +231,7 @@
       "client": "약알(Yak-al)",
       "assignee": "이상민",
       "updatedAt": "2026-07-03T15:20:00Z",
-      "status": "ready",
+      "status": "recruiting",
       "completion": 100,
       "detected": {
         "service": "커머스",
@@ -249,7 +249,7 @@
       "client": "스타트업 A",
       "assignee": "김세민",
       "updatedAt": "2026-07-04T09:00:00Z",
-      "status": "new",
+      "status": "inspection",
       "completion": 0,
       "detected": {},
       "missing": [],

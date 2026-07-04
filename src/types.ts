@@ -27,7 +27,7 @@ export interface RecommendedQuestion {
   priority: number
 }
 
-export type ProjectStatus = 'new' | 'interviewing' | 'ready' | 'won' | 'lost'
+export type ProjectStatus = 'inspection' | 'recruiting' | 'contracting' | 'completed' | 'cancelled'
 
 export interface ProjectModel {
   project_id: string
