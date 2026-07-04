@@ -29,6 +29,8 @@ function getAssigneeColor(assignee: string) {
 export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [assigneeFilter, setAssigneeFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list')
   const [showModal, setShowModal] = useState(false)
   const [modalStep, setModalStep] = useState<1 | 2>(1)
@@ -138,17 +140,20 @@ export default function KanbanBoard() {
     setInitialFiles(prev => prev.filter((_, i) => i !== index))
   }
 
-  const filteredProjects = projects.filter(p => 
-    p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.client?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProjects = projects.filter(p => {
+    const matchesSearch = p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || p.client?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesAssignee = assigneeFilter === 'all' || p.assignee === assigneeFilter
+    const matchesStatus = statusFilter === 'all' || p.status === statusFilter
+    
+    return matchesSearch && matchesAssignee && matchesStatus
+  })
 
   return (
     <div className="kanban-board">
       <header className="kanban-header">
         <h1 className="kanban-header__title">CaseLab 파이프라인</h1>
         
-        <div className="kanban-header__search">
+        <div className="kanban-header__search" style={{ display: 'flex', gap: '12px' }}>
           <input 
             type="text" 
             placeholder="프로젝트명 또는 고객사 검색..." 
@@ -156,6 +161,29 @@ export default function KanbanBoard() {
             onChange={e => setSearchTerm(e.target.value)}
             className="kanban-search-input"
           />
+          <select 
+            value={assigneeFilter}
+            onChange={e => setAssigneeFilter(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }}
+          >
+            <option value="all">담당자 전체</option>
+            <option value="장수룡">장수룡</option>
+            <option value="이상민">이상민</option>
+            <option value="김세민">김세민</option>
+            <option value="미지정">미지정</option>
+          </select>
+          <select 
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }}
+          >
+            <option value="all">상태 전체</option>
+            <option value="inspection">검수</option>
+            <option value="recruiting">모집</option>
+            <option value="contracting">계약</option>
+            <option value="completed">완료</option>
+            <option value="cancelled">취소</option>
+          </select>
         </div>
 
         <div className="kanban-header__actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
