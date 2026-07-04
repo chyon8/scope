@@ -3,55 +3,40 @@
     {
       "project_id": "123456",
       "org_id": "org_01",
-      "title": "ㅇㅇㅇ",
-      "client": "미정",
-      "assignee": "미지정",
+      "title": "무인 키오스크 시스템 구축 (Mock)",
+      "client": "아이젠소프트",
+      "assignee": "이문식",
       "updatedAt": "2026-07-04T12:14:24.703Z",
-      "status": "ready",
-      "completion": 0,
-      "detected": {},
+      "status": "interviewing",
+      "completion": 100,
+      "detected": {
+        "budget": "5,000만원",
+        "timeline": "3개월",
+        "techStack": "React, Node.js, AWS",
+        "coreFeatures": "결제 연동, 무인 주문 관리, 재고 연동",
+        "targetUser": "2030 일반 소비자"
+      },
       "missing": [],
       "recommendedQuestions": [],
       "source_documents": [],
       "events": [
         {
-          "id": "evt_1783164366708",
+          "id": "evt_init",
           "type": "quick_memo",
-          "title": "텍스트 메모 추가됨",
-          "description": "소갸ㅐ팅\r\n...",
-          "timestamp": "2026-07-04T11:26:06.708Z"
+          "title": "초기 요구사항 등록됨",
+          "description": "클라이언트로부터 무인 키오스크 개발 요청 접수.",
+          "timestamp": "2026-07-01T10:00:00.000Z"
         },
         {
-          "id": "evt_ai_1783164368711",
+          "id": "evt_ai_1",
           "type": "ai_analysis",
           "title": "AI 분석 완료",
-          "description": "새로운 소스를 바탕으로 대시보드와 공고문이 업데이트되었습니다.",
-          "timestamp": "2026-07-04T11:26:08.711Z",
-          "impact": "진행도 0%"
-        },
-        {
-          "id": "evt_status_1783167260367",
-          "type": "status_change",
-          "title": "상태 변경: ready",
-          "description": "상태가 interviewing에서 ready(으)로 변경되었습니다.",
-          "timestamp": "2026-07-04T12:14:20.367Z"
-        },
-        {
-          "id": "evt_status_1783167262817",
-          "type": "status_change",
-          "title": "상태 변경: interviewing",
-          "description": "상태가 ready에서 interviewing(으)로 변경되었습니다.",
-          "timestamp": "2026-07-04T12:14:22.817Z"
-        },
-        {
-          "id": "evt_status_1783167264703",
-          "type": "status_change",
-          "title": "상태 변경: ready",
-          "description": "상태가 interviewing에서 ready(으)로 변경되었습니다.",
-          "timestamp": "2026-07-04T12:14:24.703Z"
+          "description": "업로드된 문서를 바탕으로 대시보드와 공고문이 생성되었습니다.",
+          "timestamp": "2026-07-01T10:05:00.000Z",
+          "impact": "진행도 100%"
         }
       ],
-      "draft": ""
+      "draft": "# 무인 키오스크 시스템 구축 프로젝트 공고\n\n## 1. 프로젝트 개요\n본 프로젝트는 매장 내 무인 주문 및 결제를 처리할 수 있는 키오스크 시스템을 구축하는 건입니다. 기존 레거시 POS 시스템과의 재고 연동이 필수적이며, 빠르고 직관적인 UI/UX가 요구됩니다.\n\n## 2. 주요 기능\n- 메뉴 탐색 및 장바구니 기능\n- 카드 결제 및 간편 결제 (PG 연동)\n- 기존 POS DB 기반 실시간 재고 연동\n- 관리자 웹 대시보드 제공\n\n## 3. 필요 기술 스택\n- 프론트엔드: React 또는 React Native\n- 백엔드: Node.js 기반 (Express/NestJS)\n- 인프라: AWS 클라우드 환경\n\n## 4. 예산 및 일정\n- 예산: 5,000만 원\n- 일정: 계약일로부터 3개월 (기획/디자인/개발 포함)\n\n## 5. 우대 사항\n- 키오스크 또는 결제 시스템 구축 경험이 있는 개발사\n- 하드웨어 벤더사와의 통신 프로토콜 연동 경험 보유\n\n많은 지원 바랍니다."
     },
     {
       "project_id": "155446",

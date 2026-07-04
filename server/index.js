@@ -237,6 +237,82 @@ app.patch('/api/projects/:id/status', (req, res) => {
   res.json(project);
 });
 
+// --- MOCK MEETING APIs ---
+
+// 1. GET Meeting List by Project ID
+app.get('/api/projects/:id/meetings', (req, res) => {
+  const projectId = parseInt(req.params.id, 10) || req.params.id;
+  res.json({
+    project_id: projectId,
+    total: 2,
+    results: [
+      {
+        id: 16, title: "260623_155820_izensoft", partner_slug: "izensoft", member_name: "이문식", duration_secs: 4009, 
+        project_title: "무인 키오스크 시스템 구축", summary: "핵심 논의는 예산 및 서버 인프라에 대한 협의였습니다.", created_at: "2026-06-23 00:00:00"
+      },
+      {
+        id: 15, title: "260623_155820_dxplayground", partner_slug: "dxplayground", member_name: "이문식", duration_secs: 2800, 
+        project_title: "무인 키오스크 시스템 구축", summary: "UI/UX 커스텀 범위에 대한 1차 논의 완료.", created_at: "2026-06-23 14:00:00"
+      }
+    ]
+  });
+});
+
+// 2. GET Meeting Detail (Transcript)
+app.get('/api/meetings/:meetingId', (req, res) => {
+  const meetingId = parseInt(req.params.meetingId, 10);
+  res.json({
+    id: meetingId, project_id: 155820, partner_slug: meetingId === 16 ? "izensoft" : "dxplayground",
+    summary: "핵심 논의는...",
+    transcript: `## 요약\n서버 증설 및 데이터 이관 비용에 대한 이견 존재\n\n## 전문\n[00:01] 매니저: 안녕하세요, 프로젝트 예산 관련해서 질문 주셨는데 답변 가능하실까요?\n[00:15] 파트너: 네, 현재 제시된 5천만 원으로는 기존 데이터 이관 리스크가 있어서 1천만 원 정도 추가 증액이 필요할 것 같습니다.\n[01:40] 클라이언트: 데이터 이관이 왜 그렇게 비용이 많이 드는지 설명 부탁드립니다.\n[02:10] 파트너: 현재 쓰고 계신 레거시 DB 구조가 비정형이라 매핑 로직을 다 새로 짜야 합니다.\n[03:00] 매니저: 그럼 일정은 3개월 안에 가능한가요?\n[03:15] 파트너: 네 일정은 맞출 수 있습니다.`
+  });
+});
+
+// 3. POST Analyze Meeting (OpenAI)
+app.post('/api/meetings/:meetingId/analyze', async (req, res) => {
+  const meetingId = req.params.meetingId;
+  const data = readData();
+  
+  if (!data.meetingSummaries) data.meetingSummaries = {};
+  
+  // Return cached if exists
+  if (data.meetingSummaries[meetingId]) {
+    return res.json(data.meetingSummaries[meetingId]);
+  }
+
+  try {
+    const transcript = req.body.transcript || "전문 없음";
+    const prompt = `
+당신은 IT 외주 전문가입니다. 아래 미팅 대화 전문을 읽고, 개발사(파트너)가 제기한 리스크와 주요 Q&A를 추출하여 JSON 형식으로 반환하세요.
+반드시 아래 JSON 스키마를 지키십시오. 마크다운 없이 순수 JSON만 출력하세요.
+{
+  "risks": [ "리스크 내용1", "리스크 내용2" ],
+  "qna": [ { "question": "질문 내용", "answer": "답변 내용" } ],
+  "fitScore": "높음"
+}
+
+[대화 전문]
+${transcript}
+    `.trim();
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      response_format: { type: "json_object" }
+    });
+
+    const aiResult = JSON.parse(response.choices[0].message.content);
+    data.meetingSummaries[meetingId] = aiResult;
+    writeData(data);
+    
+    res.json(aiResult);
+  } catch (error) {
+    console.error("AI Analysis error", error);
+    res.status(500).json({ error: "AI 분석 실패" });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Backend server running on http://localhost:${port}`);
 });

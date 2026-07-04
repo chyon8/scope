@@ -56,6 +56,11 @@ export default function Workspace() {
   const [isDragging, setIsDragging] = useState(false)
   const [activeTab, setActiveTab] = useState<'inspection' | 'recruitment' | 'progress' | 'completion'>('inspection')
   
+  const [meetings, setMeetings] = useState<any[]>([])
+  const [selectedMeetingId, setSelectedMeetingId] = useState<number | null>(null)
+  const [meetingDetail, setMeetingDetail] = useState<any | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  
   const feedEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -95,6 +100,46 @@ export default function Workspace() {
   useEffect(() => {
     fetchProject()
   }, [id])
+
+  // Fetch meeting list when switching to recruitment tab
+  useEffect(() => {
+    if (activeTab === 'recruitment' && id) {
+      fetch(`http://localhost:3001/api/projects/${id}/meetings`)
+        .then(res => res.json())
+        .then(data => setMeetings(data.results || []))
+        .catch(console.error)
+    }
+  }, [activeTab, id])
+
+  const handleMeetingClick = async (meetingId: number) => {
+    setSelectedMeetingId(meetingId)
+    setMeetingDetail(null)
+    try {
+      const res = await fetch(`http://localhost:3001/api/meetings/${meetingId}`)
+      const data = await res.json()
+      setMeetingDetail(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleAnalyzeMeeting = async () => {
+    if (!meetingDetail) return
+    setIsAnalyzing(true)
+    try {
+      const res = await fetch(`http://localhost:3001/api/meetings/${meetingDetail.id}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: meetingDetail.transcript })
+      })
+      const data = await res.json()
+      setMeetingDetail(prev => ({ ...prev, aiSummary: data }))
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
 
   const handleUpload = async (file?: File, text?: string) => {
     if (!id) return
@@ -314,10 +359,27 @@ export default function Workspace() {
         </div>
       </aside>
       ) : activeTab === 'recruitment' ? (
-        <aside className="sidebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="empty-tab-view">
-            <h2>모집 및 후보 검토</h2>
-            <p>지원한 개발사 리스트와 후보 미팅 녹취 요약 기능이 들어갈 자리입니다.</p>
+        <aside className="sidebar">
+          <div className="sidebar__section">
+            <h2 className="sidebar__heading">개발사 사전 미팅 기록</h2>
+            {meetings.length === 0 ? (
+              <div className="missing-item missing-item--empty">등록된 미팅이 없습니다.</div>
+            ) : (
+              <div className="meeting-list">
+                {meetings.map(m => (
+                  <div 
+                    key={m.id} 
+                    className={`meeting-card ${selectedMeetingId === m.id ? 'meeting-card--active' : ''}`}
+                    onClick={() => handleMeetingClick(m.id)}
+                    style={{ padding: '12px', border: selectedMeetingId === m.id ? '1px solid var(--color-primary)' : '1px solid var(--color-border)', borderRadius: '8px', marginBottom: '8px', cursor: 'pointer', background: selectedMeetingId === m.id ? 'var(--color-surface-hover)' : 'var(--color-surface)' }}
+                  >
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{m.partner_slug} 미팅</div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '8px' }}>일시: {m.created_at}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-ink)' }}>{m.summary}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
       ) : activeTab === 'progress' ? (
@@ -337,7 +399,7 @@ export default function Workspace() {
       )}
 
       {/* ── Main Feed (Timeline) ── */}
-      <div className="timeline-panel">
+      <div className="timeline-panel" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="timeline-feed">
           {events.length === 0 ? (
             <div className="missing-item missing-item--empty" style={{ textAlign: 'center', marginTop: '40px' }}>
@@ -446,6 +508,63 @@ export default function Workspace() {
           </pre>
         </div>
       </aside>
+      ) : activeTab === 'recruitment' ? (
+        <aside className="preview-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="preview-panel__header">
+            <h2 className="preview-panel__heading">미팅 상세 및 AI 분석</h2>
+          </div>
+          <div className="preview-panel__content" style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, overflowY: 'auto', padding: 'var(--space-md)' }}>
+            {!meetingDetail ? (
+              <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
+                <p style={{ color: 'var(--color-muted)' }}>좌측에서 미팅을 선택해주세요.</p>
+              </div>
+            ) : (
+              <>
+                <div className="ai-summary-card" style={{ background: 'var(--color-surface-card)', padding: '16px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+                  <h3 style={{ fontSize: '14px', marginBottom: '12px', color: 'var(--color-primary)' }}>✨ AI 미팅 분석</h3>
+                  {meetingDetail.aiSummary ? (
+                    <div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <strong style={{ fontSize: '13px' }}>🚨 개발사 리스크</strong>
+                        <ul style={{ fontSize: '13px', paddingLeft: '20px', margin: '4px 0', lineHeight: 1.5 }}>
+                          {meetingDetail.aiSummary.risks.map((r: string, idx: number) => <li key={idx}>{r}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <strong style={{ fontSize: '13px' }}>💬 주요 Q&A</strong>
+                        {meetingDetail.aiSummary.qna.map((q: any, idx: number) => (
+                          <div key={idx} style={{ fontSize: '13px', background: 'var(--color-canvas)', padding: '10px', borderRadius: '6px', marginTop: '6px' }}>
+                            <div style={{ marginBottom: '4px', fontWeight: 600 }}>Q. {q.question}</div>
+                            <div style={{ color: 'var(--color-muted)' }}>A. {q.answer}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                      <p style={{ fontSize: '13px', color: 'var(--color-muted)', marginBottom: '12px' }}>아직 분석된 데이터가 없습니다.</p>
+                      <button 
+                        className="btn btn-primary" 
+                        onClick={handleAnalyzeMeeting} 
+                        disabled={isAnalyzing}
+                        style={{ fontSize: '12px', padding: '8px 16px', borderRadius: 'var(--rounded-md)' }}
+                      >
+                        {isAnalyzing ? '분석 중...' : 'AI 리스크 추출하기'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="transcript-viewer">
+                  <h3 style={{ fontSize: '14px', marginBottom: '8px', color: 'var(--color-ink)' }}>대화 원본 (Transcript)</h3>
+                  <pre className="preview-panel__text" style={{ minHeight: '300px', fontSize: '13px', lineHeight: 1.6 }}>
+                    {meetingDetail.transcript}
+                  </pre>
+                </div>
+              </>
+            )}
+          </div>
+        </aside>
       ) : (
         <aside className="preview-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-surface)' }}>
           <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
