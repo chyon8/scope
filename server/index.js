@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const pdfParse = require('pdf-parse');
 const { OpenAI } = require('openai');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const { generateAnalysisPrompt } = require('./prompt');
 
@@ -51,10 +51,15 @@ app.get('/api/projects/:id', (req, res) => {
 
 // POST a new project
 app.post('/api/projects', (req, res) => {
-  const { title, client, assignee } = req.body;
+  const { project_id, title, client, assignee } = req.body;
   const data = readData();
+  
+  if (data.projects.some(p => p.project_id === project_id)) {
+    return res.status(400).json({ error: '이미 존재하는 프로젝트 아이디입니다.' });
+  }
+
   const newProject = {
-    project_id: `proj_${Date.now()}`,
+    project_id: project_id,
     org_id: 'org_01',
     title: title || '새 프로젝트',
     client: client || '미정',
@@ -75,9 +80,9 @@ app.post('/api/projects', (req, res) => {
 });
 
 // AI setup
+console.log('OPENAI_API_KEY detected:', !!process.env.OPENAI_API_KEY);
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'dummy_key', 
-  // Warning: This won't work without a real key
+  apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
 });
 
 // POST upload file/text to a project
@@ -187,6 +192,16 @@ app.post('/api/projects/:id/upload', upload.single('file'), async (req, res) => 
   writeData(data);
   
   res.json(project);
+});
+
+// DELETE a project
+app.delete('/api/projects/:id', (req, res) => {
+  const data = readData();
+  const idx = data.projects.findIndex(p => p.project_id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  data.projects.splice(idx, 1);
+  writeData(data);
+  res.json({ success: true });
 });
 
 app.listen(port, () => {

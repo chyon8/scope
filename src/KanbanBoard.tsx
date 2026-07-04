@@ -30,6 +30,7 @@ export default function KanbanBoard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [modalStep, setModalStep] = useState<1 | 2>(1)
+  const [newProjectId, setNewProjectId] = useState('')
   const [newTitle, setNewTitle] = useState('')
   const [newAssignee, setNewAssignee] = useState<'장수룡' | '이상민' | '김세민' | '미지정'>('미지정')
   const [initialText, setInitialText] = useState('')
@@ -56,6 +57,7 @@ export default function KanbanBoard() {
   const openModal = () => {
     setShowModal(true)
     setModalStep(1)
+    setNewProjectId('')
     setNewTitle('')
     setNewAssignee('미지정')
     setInitialText('')
@@ -81,9 +83,15 @@ export default function KanbanBoard() {
       const createRes = await fetch('http://localhost:3001/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, assignee: newAssignee })
+        body: JSON.stringify({ project_id: newProjectId, title: newTitle, assignee: newAssignee })
       })
       const newProj = await createRes.json()
+      
+      if (newProj.error) {
+        alert(newProj.error)
+        setIsCreating(false)
+        return
+      }
 
       // 2. Send initial requirements text (+ files) to upload endpoint
       const formData = new FormData()
@@ -101,6 +109,18 @@ export default function KanbanBoard() {
       console.error("Failed to create project", e)
     } finally {
       setIsCreating(false)
+    }
+  }
+
+  const handleDeleteProject = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation() // Prevent navigating to workspace
+    if (!confirm('정말 이 프로젝트를 삭제하시겠습니까?')) return
+    
+    try {
+      await fetch(`http://localhost:3001/api/projects/${id}`, { method: 'DELETE' })
+      setProjects(prev => prev.filter(p => p.project_id !== id))
+    } catch (e) {
+      console.error("Failed to delete project", e)
     }
   }
 
@@ -161,10 +181,19 @@ export default function KanbanBoard() {
                     className="kanban-card"
                     onClick={() => navigate(`/project/${p.project_id}`)}
                   >
-                    <div className="kanban-card__header">
+                    <div className="kanban-card__header" style={{ position: 'relative' }}>
                       <span className="kanban-card__client">{p.client}</span>
-                      {p.status === 'won' && <span className="kanban-card__badge kanban-card__badge--won">계약 완료</span>}
-                      {p.status === 'lost' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        {p.status === 'won' && <span className="kanban-card__badge kanban-card__badge--won">계약 완료</span>}
+                        {p.status === 'lost' && <span className="kanban-card__badge kanban-card__badge--lost">취소</span>}
+                        <button 
+                          className="kanban-card__delete" 
+                          onClick={(e) => handleDeleteProject(e, p.project_id)}
+                          title="삭제"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                     <h3 className="kanban-card__title">{p.title}</h3>
                     <div className="kanban-card__footer">
@@ -207,6 +236,18 @@ export default function KanbanBoard() {
             {modalStep === 1 ? (
               <form onSubmit={handleStep1Next}>
                 <h2>새 프로젝트 등록</h2>
+                <div className="form-group">
+                  <label>프로젝트 아이디 (6자리 숫자)</label>
+                  <input 
+                    required 
+                    type="text"
+                    pattern="[0-9]{6}"
+                    title="6자리 숫자를 입력하세요"
+                    value={newProjectId} 
+                    onChange={e => setNewProjectId(e.target.value)} 
+                    placeholder="예: 156594"
+                  />
+                </div>
                 <div className="form-group">
                   <label>프로젝트명</label>
                   <input 
@@ -287,7 +328,11 @@ export default function KanbanBoard() {
                     onClick={handleCreateProject}
                     disabled={!initialText.trim() || isCreating}
                   >
-                    {isCreating ? '생성 중...' : '프로젝트 시작하기'}
+                    {isCreating ? (
+                      <>
+                        <span className="spinner" /> AI가 분석 중입니다...
+                      </>
+                    ) : '프로젝트 시작하기'}
                   </button>
                 </div>
               </div>

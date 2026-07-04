@@ -226,7 +226,9 @@ export default function Workspace() {
                      key === 'currentOperation' ? '현재 운영' : key}
                   </div>
                   <div className="detected-item__value">
-                    {Array.isArray(val) ? val.join(', ') : val as string}
+                    {Array.isArray(val) 
+                      ? val.join(', ') 
+                      : (typeof val === 'object' ? JSON.stringify(val) : val as string)}
                   </div>
                 </div>
               ))
