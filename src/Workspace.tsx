@@ -61,7 +61,20 @@ export default function Workspace() {
   const [meetingDetail, setMeetingDetail] = useState<any | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   
+  const MOCK_WISHKET_HISTORY = [
+    { id: 1, author: "이문식", date: "2026-07-03 18:06", content: "프로젝트의 듀데잇을 2026년 07월 06일로 변경하였습니다." },
+    { id: 2, author: "이문식", date: "2026-07-03 18:03", content: "다음 주 월요일 중으로 적합한 파트너 전달 필요 + 파트너 서치 필요함\n인터넷 전화 쪽 jackee 파트너 진행 가능한 것으로 알고 있음" },
+    { id: 3, author: "이문식", date: "2026-07-03 15:37", content: "[클/원도연] 아 네 안녕하세요! 업무가 바쁘시다 보면 그럴수 있습니다 충분히 이해합니다\n[위시켓 이문식] 현재 여러 상용 솔루션을 찾아봤지만 기능은 비슷하나 마음에 드는 CRM 시스템이 아니라서 내부 상황에 맞는 소프트웨어를 개발하고 싶으신 것으로 확인하였습니다." },
+    { id: 4, author: "김나연", date: "2026-07-02 17:18", content: "[고객의 핵심 과업]\n전화 영업으로 확장되는 TM 운영에서 상담사 입력을 표준화하고, 관리자가 고객 가망도 판단과 후속 관리를 신뢰할 수 있게 만드는 CRM을 구축한다.\n\n[고객의 정서적·사회적 과업]\n- 정서적: 개발 지식이 낮은 상태에서 업체 설명을 이해하지 못한 채 결정해야 하는 불안과 의심에서 벗어나고 싶음." }
+  ]
+
   const MOCK_RECRUITMENT_DASHBOARD = {
+    meta: {
+      budget: "5,000만 원",
+      schedule: "3개월",
+      govSupport: true,
+      labels: ["죽밥", "삼자유도", "지원사업"]
+    },
     managerComment: "현재 예산(5,000만 원)으로 지원하는 개발사가 적어, 클라이언트에게 예산 1천만 원 증액 혹은 기능 다이어트를 설득 중입니다.",
     funnel: { views: 124, applications: 5, meetings: 2, shortlisted: 1 },
     issues: [
@@ -385,7 +398,7 @@ export default function Workspace() {
               onClick={() => { setSelectedMeetingId(null); setMeetingDetail(null); }}
               style={{ padding: '12px', border: selectedMeetingId === null ? '1px solid var(--color-primary)' : '1px solid var(--color-border)', borderRadius: '8px', marginBottom: '24px', cursor: 'pointer', background: selectedMeetingId === null ? 'var(--color-surface-hover)' : 'var(--color-surface)' }}
             >
-              <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-ink)' }}>📊 모집 현황 요약 (대시보드)</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-ink)' }}>📊 히스토리 보기</div>
             </div>
 
             <h2 className="sidebar__heading">개발사 사전 미팅 기록</h2>
@@ -429,7 +442,34 @@ export default function Workspace() {
       <div className="timeline-panel" style={{ backgroundColor: 'var(--color-surface)', overflowY: 'auto' }}>
         {activeTab === 'recruitment' ? (
           <div className="recruitment-dashboard" style={{ padding: 'var(--space-xl)' }}>
-            <h2 className="preview-panel__heading" style={{ marginBottom: '24px' }}>📊 모집 단계 통합 대시보드</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 className="preview-panel__heading" style={{ marginBottom: 0 }}>📊 모집 단계 통합 대시보드</h2>
+              <button className="btn btn-secondary" style={{ fontSize: '13px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', borderRadius: '4px', cursor: 'pointer' }} onClick={() => alert('위시켓 최신 데이터 동기화 기능은 연동 예정입니다.')}>
+                🔄 최신 데이터 동기화
+              </button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>예산</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.budget}</div>
+              </div>
+              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>일정</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.schedule}</div>
+              </div>
+              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>정부지원사업</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? 'var(--color-primary)' : 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? '대상 (O)' : '해당 없음'}</div>
+              </div>
+              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>주요 라벨</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-ink)', display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {MOCK_RECRUITMENT_DASHBOARD.meta.labels.map(l => <span key={l} style={{ background: 'var(--color-canvas)', padding: '2px 6px', borderRadius: '4px' }}>{l}</span>)}
+                </div>
+              </div>
+            </div>
+
             <div style={{ padding: '16px', backgroundColor: 'rgba(204, 120, 92, 0.1)', borderRadius: '8px', color: 'var(--color-primary)', fontWeight: 600, fontSize: '14px', marginBottom: '20px' }}>
               🗣️ 담당 매니저 한줄 요약: {MOCK_RECRUITMENT_DASHBOARD.managerComment}
             </div>
@@ -618,7 +658,25 @@ export default function Workspace() {
             </h2>
           </div>
           <div className="preview-panel__content" style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, overflowY: 'auto', padding: 'var(--space-md)' }}>
-            {!meetingDetail ? (
+            {selectedMeetingId === null ? (
+              <div className="history-board" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', margin: 0 }}>원본 히스토리 보드</h3>
+                  <button className="btn btn-primary" style={{ fontSize: '12px', padding: '6px 12px' }} onClick={() => alert('AI 요약 기능은 연동 예정입니다.')}>✨ AI 전체 요약하기</button>
+                </div>
+                {MOCK_WISHKET_HISTORY.map(h => (
+                  <div key={h.id} style={{ background: 'var(--color-surface)', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-hairline)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <strong style={{ fontSize: '13px', color: 'var(--color-ink)' }}>{h.author}</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--color-muted)' }}>{h.date}</span>
+                    </div>
+                    <pre style={{ fontSize: '13px', color: 'var(--color-body)', whiteSpace: 'pre-wrap', lineHeight: 1.6, fontFamily: 'inherit', margin: 0 }}>
+                      {h.content}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            ) : !meetingDetail ? (
               <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
                 <p style={{ color: 'var(--color-muted)' }}>좌측에서 미팅을 선택해주세요.</p>
               </div>
