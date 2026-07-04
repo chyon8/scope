@@ -1,4 +1,4 @@
-# Project Detective — 제품 기획서 v2.0
+# CaseLab — 제품 기획서 v2.0
 
 ## 1. 제품 정의
 

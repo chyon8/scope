@@ -1,6 +1,6 @@
-# STYLE.md — Project Detective 디자인 시스템
+# STYLE.md — CaseLab 디자인 시스템
 
-> Claude.com의 디자인 시스템을 기반으로 한 Project Detective UI 가이드.
+> Claude.com의 디자인 시스템을 기반으로 한 CaseLab UI 가이드.
 > 개발 시 이 문서의 토큰과 컴포넌트 스펙을 반드시 참조한다.
 > **하드코딩된 색상값, 폰트 사이즈, 스페이싱 사용 금지 — CSS Custom Properties로만 적용.**
 

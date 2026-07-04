@@ -1,4 +1,4 @@
-# CLAUDE.md — Project Detective 개발 가이드라인
+# CLAUDE.md — CaseLab 개발 가이드라인
 
 > Behavioral guidelines to reduce common LLM coding mistakes.
 > Merge with project-specific instructions as needed.
@@ -87,7 +87,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ### 5-1. 프로젝트 개요
 
-**Project Detective**는 IT 외주 컨설턴트가 프로젝트 자료(문서/링크)를 업로드하면, AI가 이를 구조화된 Project Model로 변환하고, 부족한 정보만 골라 질문하여 견적/공고/리스크 산출물을 만드는 에이전트.
+**CaseLab**는 IT 외주 컨설턴트가 프로젝트 자료(문서/링크)를 업로드하면, AI가 이를 구조화된 Project Model로 변환하고, 부족한 정보만 골라 질문하여 견적/공고/리스크 산출물을 만드는 에이전트.
 
 - **핵심 가치:** AI가 문서를 읽고 사람은 AI의 이해를 "검토·승인"만 한다.
 - **타겟 사용자:** IT 외주 컨설턴트 / SI 영업 담당 / 프리랜서 PM

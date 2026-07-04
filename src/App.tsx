@@ -20,7 +20,7 @@ function App() {
               <circle cx="12" cy="12" r="10" />
               <path d="M12 2v20M2 12h20" />
             </svg>
-            <span className="top-nav__name">Project Detective</span>
+            <span className="top-nav__name">CaseLab</span>
           </a>
         </div>
       </nav>

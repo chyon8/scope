@@ -1,4 +1,4 @@
-// Project Detective — Core Types (from PRD schema)
+// CaseLab — Core Types (from PRD schema)
 
 export interface SourceDocument {
   doc_id: string

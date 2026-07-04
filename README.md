@@ -1,4 +1,4 @@
-# Project Detective
+# CaseLab
 
 > IT 외주 컨설턴트가 프로젝트 자료를 업로드하면, AI가 구조화된 Project Model로 변환하고 부족한 정보를 질문하여 견적/공고/리스크 산출물을 만드는 에이전트.
 
