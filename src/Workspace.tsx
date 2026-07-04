@@ -1,17 +1,21 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { mockProject, mockTimelineEvents } from './mock-data'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import type { ProjectModel, TimelineEvent } from './types'
 import './Workspace.css'
 
-function getStatusLabel(status: ProjectModel['status']): string {
+function getStatusLabel(status: string): string {
   switch (status) {
-    case 'collecting': return '자료 수집 중'
+    case 'new': return '신규 문의'
     case 'interviewing': return '정보 갱신 중'
-    case 'ready_for_output': return '산출물 준비 완료'
+    case 'ready': return '산출물 준비 완료'
+    case 'won': return '계약 완료'
+    case 'lost': return '취소'
+    default: return '상태 불명'
   }
 }
 
 function formatTime(iso: string): string {
+  if (!iso) return ''
   const d = new Date(iso)
   return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
 }
@@ -32,7 +36,7 @@ function renderStars(priority: number) {
   return '★'.repeat(priority) + '☆'.repeat(5 - priority)
 }
 
-function getEventIcon(type: TimelineEvent['type']) {
+function getEventIcon(type: string) {
   switch (type) {
     case 'document_upload': return '📄'
     case 'audio_upload': return '🎧'
@@ -42,18 +46,18 @@ function getEventIcon(type: TimelineEvent['type']) {
   }
 }
 
-interface WorkspaceProps {
-  project: ProjectModel
-  onBack: () => void
-}
+export default function Workspace() {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
 
-export default function Workspace({ project: initialProject, onBack }: WorkspaceProps) {
-  const [project, setProject] = useState<ProjectModel>(() => ({ ...initialProject }))
-  const [events, setEvents] = useState<TimelineEvent[]>(() => [...mockTimelineEvents])
+  const [project, setProject] = useState<ProjectModel | null>(null)
+  const [events, setEvents] = useState<TimelineEvent[]>([])
   const [memoValue, setMemoValue] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  
   const feedEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const scrollToBottom = useCallback(() => {
     feedEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -71,23 +75,64 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
     }
   }, [memoValue])
 
+  const fetchProject = async () => {
+    if (!id) return
+    try {
+      const res = await fetch(`http://localhost:3001/api/projects/${id}`)
+      if (!res.ok) {
+        navigate('/')
+        return
+      }
+      const data = await res.json()
+      setProject(data)
+      setEvents(data.events || [])
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    fetchProject()
+  }, [id])
+
+  const handleUpload = async (file?: File, text?: string) => {
+    if (!id) return
+    
+    const formData = new FormData()
+    if (file) formData.append('file', file)
+    if (text) formData.append('text', text)
+
+    // Add optimistic UI event
+    const now = new Date().toISOString()
+    const optimisticEvent: TimelineEvent = {
+      id: `evt_opt_${Date.now()}`,
+      type: file ? (file.type.includes('audio') ? 'audio_upload' : 'document_upload') : 'quick_memo',
+      title: file ? `${file.name} 업로드 중...` : '빠른 메모 업로드 중...',
+      description: text || '파일을 업로드 중입니다.',
+      timestamp: now,
+    }
+    setEvents(prev => [...prev, optimisticEvent])
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/projects/${id}/upload`, {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+      setProject(data)
+      setEvents(data.events || [])
+      setMemoValue('')
+    } catch (e) {
+      console.error("Upload failed", e)
+      // Remove optimistic event on failure (simplified)
+      fetchProject() 
+    }
+  }
+
   function handleAddMemo() {
     const text = memoValue.trim()
     if (!text) return
-
-    const now = new Date().toISOString()
-    const memoEvent: TimelineEvent = {
-      id: `evt_${Date.now()}`,
-      type: 'quick_memo',
-      title: '빠른 메모 추가됨',
-      description: text,
-      timestamp: now,
-    }
-    setEvents(prev => [...prev, memoEvent])
-    setMemoValue('')
-
-    // Mock completion increase
-    triggerMockAnalysis()
+    handleUpload(undefined, text)
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -103,50 +148,13 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
   function handleDrop(e: React.DragEvent) {
     e.preventDefault()
     setIsDragging(false)
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length === 0) return
-
-    const now = new Date().toISOString()
-    const fileEvent: TimelineEvent = {
-      id: `evt_${Date.now()}`,
-      type: files[0].type.includes('audio') ? 'audio_upload' : 'document_upload',
-      title: `${files[0].name} 업로드 됨`,
-      description: '새로운 소스 파일이 시스템에 등록되었습니다.',
-      timestamp: now,
-    }
-    setEvents(prev => [...prev, fileEvent])
-
-    triggerMockAnalysis()
+    const file = e.dataTransfer.files?.[0]
+    if (file) handleUpload(file)
   }
-
-  function triggerMockAnalysis() {
-    setTimeout(() => {
-      setProject(prev => {
-        const next = { ...prev }
-        next.completion = Math.min(100, next.completion + 15)
-        if (next.completion >= 100) {
-          next.status = 'ready_for_output'
-        }
-        if (next.missing.length > 0) {
-          next.missing = [...next.missing.slice(1)]
-        }
-        next.detected = {
-          ...next.detected,
-          "추가 정보": "방금 입력된 내용 반영됨",
-        }
-        return next
-      })
-
-      const aiEvent: TimelineEvent = {
-        id: `evt_${Date.now() + 1}`,
-        type: 'ai_analysis',
-        title: '신규 소스 분석 완료',
-        description: '입력된 정보를 바탕으로 대시보드와 공고문을 업데이트했습니다.',
-        timestamp: new Date().toISOString(),
-        impact: `진행도 상승`,
-      }
-      setEvents(prev => [...prev, aiEvent])
-    }, 1200)
+  
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) handleUpload(file)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -156,25 +164,27 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
     }
   }
 
+  if (!project) return null
+
   return (
     <div className="workspace">
       {/* ── Project Header ── */}
       <header className="project-header">
         <div className="project-header__left">
-          <button className="btn btn-secondary btn-icon" onClick={onBack} title="전체 프로젝트로 돌아가기">
+          <button className="btn btn-secondary btn-icon" onClick={() => navigate('/')} title="전체 프로젝트로 돌아가기" style={{ marginRight: '16px' }}>
             ←
           </button>
           <h1 className="project-header__title">{project.title}</h1>
-          <span className={`project-header__status project-header__status--${project.status === 'ready_for_output' ? 'ready' : project.status}`}>
+          <span className={`project-header__status project-header__status--${project.status === 'ready' ? 'ready' : 'interviewing'}`}>
             <span className="project-header__status-dot" />
-            {getStatusLabel(project.status as any)}
+            {getStatusLabel(project.status)}
           </span>
         </div>
         <div className="project-header__right">
           <button className="btn btn-secondary" type="button">
             공고 템플릿 설정
           </button>
-          <button className="btn btn-primary" type="button" disabled={project.status !== 'ready_for_output'}>
+          <button className="btn btn-primary" type="button" disabled={project.status !== 'ready'}>
             최종 공고 생성
           </button>
         </div>
@@ -201,22 +211,26 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
         <div className="sidebar__section">
           <h2 className="sidebar__heading">AI가 파악한 프로젝트</h2>
           <div className="detected-grid">
-            {Object.entries(project.detected).map(([key, val]) => (
-              <div key={key} className="detected-item">
-                <div className="detected-item__label">
-                  {key === 'service' ? '서비스' : 
-                   key === 'platform' ? '플랫폼' : 
-                   key === 'projectType' ? '개발 형태' : 
-                   key === 'users' ? '예상 사용자' : 
-                   key === 'coreFeatures' ? '핵심 기능' : 
-                   key === 'admin' ? '관리자' : 
-                   key === 'currentOperation' ? '현재 운영' : key}
+            {Object.keys(project.detected || {}).length === 0 ? (
+              <div className="missing-item missing-item--empty">아직 파악된 정보가 없습니다.</div>
+            ) : (
+              Object.entries(project.detected).map(([key, val]) => (
+                <div key={key} className="detected-item">
+                  <div className="detected-item__label">
+                    {key === 'service' ? '서비스' : 
+                     key === 'platform' ? '플랫폼' : 
+                     key === 'projectType' ? '개발 형태' : 
+                     key === 'users' ? '예상 사용자' : 
+                     key === 'coreFeatures' ? '핵심 기능' : 
+                     key === 'admin' ? '관리자' : 
+                     key === 'currentOperation' ? '현재 운영' : key}
+                  </div>
+                  <div className="detected-item__value">
+                    {Array.isArray(val) ? val.join(', ') : val as string}
+                  </div>
                 </div>
-                <div className="detected-item__value">
-                  {Array.isArray(val) ? val.join(', ') : val}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -224,7 +238,7 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
         <div className="sidebar__section">
           <h2 className="sidebar__heading">아직 확인되지 않은 정보</h2>
           <div className="missing-list">
-            {project.missing.map((item, idx) => (
+            {(project.missing || []).map((item, idx) => (
               <div key={idx} className="missing-item">
                 <span className={`missing-item__badge ${getPriorityBadgeClass(item.priority)}`}>
                   {getPriorityLabel(item.priority)}
@@ -232,7 +246,7 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
                 <span className="missing-item__title">{item.title}</span>
               </div>
             ))}
-            {project.missing.length === 0 && (
+            {(project.missing || []).length === 0 && (
               <div className="missing-item missing-item--empty">
                 모든 필수 정보가 수집되었습니다.
               </div>
@@ -244,7 +258,7 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
         <div className="sidebar__section">
           <h2 className="sidebar__heading">추천 질문 (통화 전 체크리스트)</h2>
           <div className="question-list">
-            {project.recommendedQuestions.map((q, idx) => (
+            {(project.recommendedQuestions || []).map((q, idx) => (
               <div key={idx} className="question-card">
                 <div className="question-card__header">
                   <span className="question-card__number">{idx + 1}.</span>
@@ -256,6 +270,11 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
                 </div>
               </div>
             ))}
+            {(project.recommendedQuestions || []).length === 0 && (
+              <div className="missing-item missing-item--empty">
+                추천할 질문이 없습니다.
+              </div>
+            )}
           </div>
         </div>
       </aside>
@@ -263,23 +282,29 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
       {/* ── Center Panel (Timeline & Dropzone) ── */}
       <div className="timeline-panel">
         <div className="timeline-feed">
-          {events.map((evt) => (
-            <div key={evt.id} className={`timeline-event timeline-event--${evt.type}`}>
-              <div className="timeline-event__icon">
-                {getEventIcon(evt.type)}
-              </div>
-              <div className="timeline-event__content">
-                <div className="timeline-event__header">
-                  <h3 className="timeline-event__title">{evt.title}</h3>
-                  <span className="timeline-event__time">{formatTime(evt.timestamp)}</span>
-                </div>
-                <p className="timeline-event__desc">{evt.description}</p>
-                {evt.impact && (
-                  <div className="timeline-event__impact">{evt.impact}</div>
-                )}
-              </div>
+          {events.length === 0 ? (
+            <div className="missing-item missing-item--empty" style={{ textAlign: 'center', marginTop: '40px' }}>
+              아직 등록된 활동이 없습니다.<br/>하단에 녹취록이나 문서를 업로드해보세요.
             </div>
-          ))}
+          ) : (
+            events.map((evt) => (
+              <div key={evt.id} className={`timeline-event timeline-event--${evt.type}`}>
+                <div className="timeline-event__icon">
+                  {getEventIcon(evt.type)}
+                </div>
+                <div className="timeline-event__content">
+                  <div className="timeline-event__header">
+                    <h3 className="timeline-event__title">{evt.title}</h3>
+                    <span className="timeline-event__time">{formatTime(evt.timestamp)}</span>
+                  </div>
+                  <p className="timeline-event__desc">{evt.description}</p>
+                  {evt.impact && (
+                    <div className="timeline-event__impact">{evt.impact}</div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
           <div ref={feedEndRef} />
         </div>
 
@@ -289,7 +314,14 @@ export default function Workspace({ project: initialProject, onBack }: Workspace
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
           >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              style={{ display: 'none' }} 
+              onChange={handleFileSelect} 
+            />
             <div className="dropzone__icon">📥</div>
             <div className="dropzone__text">
               <strong>통화 녹취록</strong> 또는 <strong>요구사항 문서</strong>를 이곳에 끌어다 놓으세요.

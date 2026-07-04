@@ -1,0 +1,104 @@
+{
+  "projects": [
+    {
+      "project_id": "proj_001",
+      "org_id": "org_01",
+      "title": "TM CRM 앱 및 관리자 웹 신규 구축",
+      "client": "(주)한국통신영업",
+      "assignee": "장수룡",
+      "updatedAt": "2026-07-04T10:16:30Z",
+      "status": "interviewing",
+      "completion": 68,
+      "detected": {
+        "service": "CRM 앱",
+        "platform": "iOS, Android, Web",
+        "users": "TM 마케터 250명",
+        "coreFeatures": ["인터넷 전화(VoIP)", "통화 녹음", "AI 텍스트 변환(STT)", "고객 관리", "일정 관리"],
+        "admin": "통화 이력 조회, 영업 파이프라인 모니터링",
+        "currentOperation": "개인 폰 + 수기 엑셀 관리"
+      },
+      "missing": [
+        { "title": "결제 PG사 연동 여부", "priority": 5 },
+        { "title": "기존 DB 마이그레이션", "priority": 4 },
+        { "title": "관리자 페이지 권한 뎁스", "priority": 3 }
+      ],
+      "recommendedQuestions": [
+        {
+          "question": "앱 내에서 인터넷 전화를 발신하려면 통신사 회선 계약이 필요한데, 이 부분도 개발사에 일임하시나요?",
+          "reason": "단순 API 연동인지, 통신 인프라까지 턴키로 맡기는지에 따라 견적이 2배 이상 차이납니다.",
+          "priority": 5
+        },
+        {
+          "question": "현재 사용 중이신 엑셀 고객 데이터를 신규 DB로 마이그레이션 해야 하나요?",
+          "reason": "기존 데이터의 정합성을 맞추는 작업은 추가 공수가 크게 들어갑니다.",
+          "priority": 4
+        }
+      ],
+      "source_documents": [
+        { "doc_id": "doc_001", "name": "TM_CRM_요구사항_초안.pdf", "type": "pdf", "status": "processed" }
+      ],
+      "events": [
+        {
+          "id": "evt_001",
+          "type": "document_upload",
+          "title": "TM_CRM_요구사항_초안.pdf 업로드 됨",
+          "description": "초기 요구사항 문서가 시스템에 등록되었습니다.",
+          "timestamp": "2026-07-04T09:00:00Z"
+        },
+        {
+          "id": "evt_002",
+          "type": "ai_analysis",
+          "title": "AI 초기 문서 분석 완료",
+          "description": "핵심 기능(CRM, AI STT, 통화 녹취)을 파악했습니다. 누락된 필수 정보 6건을 발견했습니다.",
+          "timestamp": "2026-07-04T09:00:15Z",
+          "impact": "진행도 40% 달성"
+        },
+        {
+          "id": "evt_003",
+          "type": "audio_upload",
+          "title": "1차 킥오프 통화.mp3 업로드 됨",
+          "description": "고객과의 1차 유선 미팅 녹취 파일이 등록되었습니다.",
+          "timestamp": "2026-07-04T10:15:00Z"
+        },
+        {
+          "id": "evt_004",
+          "type": "ai_analysis",
+          "title": "통화 녹취 분석 완료",
+          "description": "관리자 권한 상세 내용 및 기존 시스템 유무가 확인되어 공고문에 반영되었습니다.",
+          "timestamp": "2026-07-04T10:16:30Z",
+          "impact": "진행도 68% 달성"
+        }
+      ]
+    },
+    {
+      "project_id": "proj_002",
+      "org_id": "org_01",
+      "title": "아이허브 제휴 연동 쿠폰 시스템",
+      "client": "약알(Yak-al)",
+      "assignee": "이상민",
+      "updatedAt": "2026-07-03T15:20:00Z",
+      "status": "ready",
+      "completion": 100,
+      "detected": { "service": "커머스", "platform": "웹" },
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": []
+    },
+    {
+      "project_id": "proj_003",
+      "org_id": "org_01",
+      "title": "유저 테스트용 웹앱 프로토타입 제작",
+      "client": "스타트업 A",
+      "assignee": "김세민",
+      "updatedAt": "2026-07-04T09:00:00Z",
+      "status": "new",
+      "completion": 0,
+      "detected": {},
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": []
+    }
+  ]
+}

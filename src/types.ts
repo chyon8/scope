@@ -42,6 +42,7 @@ export interface ProjectModel {
   missing: MissingInfo[]
   recommendedQuestions: RecommendedQuestion[]
   source_documents: SourceDocument[]
+  events: TimelineEvent[]
   draft?: string
 }
 

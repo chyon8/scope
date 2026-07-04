@@ -158,3 +158,80 @@
   font-size: 11px;
   color: var(--color-muted);
 }
+
+/* ─── Search Input ─────────────────────────────── */
+.kanban-header__search {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 var(--space-xl);
+}
+
+.kanban-search-input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: var(--rounded-pill);
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-surface-soft);
+  font-size: 14px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.kanban-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.1);
+  background-color: var(--color-canvas);
+}
+
+/* ─── Modal ────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background-color: var(--color-canvas);
+  padding: var(--space-xl);
+  border-radius: var(--rounded-lg);
+  width: 400px;
+  max-width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: var(--space-lg);
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--color-ink);
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border-radius: var(--rounded-md);
+  border: 1px solid var(--color-hairline);
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
