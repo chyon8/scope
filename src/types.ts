@@ -1,22 +1,5 @@
 // Project Detective — Core Types (from PRD schema)
 
-export interface SectionData {
-  label: string
-  value: string
-  confidence: number // 0-100
-  source: 'document' | 'user' | 'ai_inferred'
-  source_refs: string[]
-  updated_at: string
-}
-
-export interface Hypothesis {
-  id: string
-  statement: string
-  confidence: number
-  status: 'unconfirmed' | 'confirmed' | 'rejected'
-  related_section: string
-}
-
 export interface SourceDocument {
   doc_id: string
   name: string
@@ -24,23 +7,36 @@ export interface SourceDocument {
   status: 'processed' | 'failed' | 'pending_auth'
 }
 
-export interface InterviewLogEntry {
-  turn_id: string
+export interface DetectedInfo {
+  service: string
+  platform: string
+  projectType: string
+  users: string
+  coreFeatures: string[]
+  [key: string]: any
+}
+
+export interface MissingInfo {
+  title: string
+  priority: number
+}
+
+export interface RecommendedQuestion {
   question: string
-  answer: string
-  affected_sections: string[]
-  confidence_delta: number
+  reason: string
+  priority: number
 }
 
 export interface ProjectModel {
   project_id: string
   org_id: string
   status: 'collecting' | 'interviewing' | 'ready_for_output'
-  overall_confidence: number
-  sections: Record<string, SectionData>
-  hypotheses: Hypothesis[]
+  completion: number // 0-100
+  detected: DetectedInfo
+  missing: MissingInfo[]
+  recommendedQuestions: RecommendedQuestion[]
   source_documents: SourceDocument[]
-  interview_log: InterviewLogEntry[]
+  draft?: string
 }
 
 export interface InterviewMessage {
@@ -48,5 +44,4 @@ export interface InterviewMessage {
   role: 'ai' | 'user'
   content: string
   timestamp: string
-  affected_sections: string[]
 }
