@@ -129,6 +129,22 @@ export default function Workspace() {
     }
   }
 
+  async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newStatus = e.target.value
+    setProject(prev => prev ? { ...prev, status: newStatus as any } : null)
+    
+    try {
+      await fetch(`http://localhost:3001/api/projects/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      fetchProject() // reload to get new event
+    } catch (error) {
+      console.error("Failed to update status", error)
+    }
+  }
+
   function handleAddMemo() {
     const text = memoValue.trim()
     if (!text) return
@@ -175,10 +191,17 @@ export default function Workspace() {
             ←
           </button>
           <h1 className="project-header__title">{project.title}</h1>
-          <span className={`project-header__status project-header__status--${project.status === 'ready' ? 'ready' : 'interviewing'}`}>
-            <span className="project-header__status-dot" />
-            {getStatusLabel(project.status)}
-          </span>
+          <select 
+            className={`project-header__status project-header__status--${project.status}`}
+            value={project.status}
+            onChange={handleStatusChange}
+          >
+            <option value="new">신규 문의</option>
+            <option value="interviewing">상담 및 정보 수집</option>
+            <option value="ready">모집 중 (공고 완성)</option>
+            <option value="won">계약 완료</option>
+            <option value="lost">취소/보류</option>
+          </select>
         </div>
         <div className="project-header__right">
           <button className="btn btn-secondary" type="button">

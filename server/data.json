@@ -1,20 +1,74 @@
 {
   "projects": [
     {
-      "project_id": "156594",
+      "project_id": "123456",
       "org_id": "org_01",
-      "title": "TM",
+      "title": "ㅇㅇㅇ",
       "client": "미정",
-      "assignee": "이상민",
-      "updatedAt": "2026-07-04T11:01:09.987Z",
+      "assignee": "미지정",
+      "updatedAt": "2026-07-04T12:14:24.703Z",
+      "status": "ready",
+      "completion": 0,
+      "detected": {},
+      "missing": [],
+      "recommendedQuestions": [],
+      "source_documents": [],
+      "events": [
+        {
+          "id": "evt_1783164366708",
+          "type": "quick_memo",
+          "title": "텍스트 메모 추가됨",
+          "description": "소갸ㅐ팅\r\n...",
+          "timestamp": "2026-07-04T11:26:06.708Z"
+        },
+        {
+          "id": "evt_ai_1783164368711",
+          "type": "ai_analysis",
+          "title": "AI 분석 완료",
+          "description": "새로운 소스를 바탕으로 대시보드와 공고문이 업데이트되었습니다.",
+          "timestamp": "2026-07-04T11:26:08.711Z",
+          "impact": "진행도 0%"
+        },
+        {
+          "id": "evt_status_1783167260367",
+          "type": "status_change",
+          "title": "상태 변경: ready",
+          "description": "상태가 interviewing에서 ready(으)로 변경되었습니다.",
+          "timestamp": "2026-07-04T12:14:20.367Z"
+        },
+        {
+          "id": "evt_status_1783167262817",
+          "type": "status_change",
+          "title": "상태 변경: interviewing",
+          "description": "상태가 ready에서 interviewing(으)로 변경되었습니다.",
+          "timestamp": "2026-07-04T12:14:22.817Z"
+        },
+        {
+          "id": "evt_status_1783167264703",
+          "type": "status_change",
+          "title": "상태 변경: ready",
+          "description": "상태가 interviewing에서 ready(으)로 변경되었습니다.",
+          "timestamp": "2026-07-04T12:14:24.703Z"
+        }
+      ],
+      "draft": ""
+    },
+    {
+      "project_id": "155446",
+      "org_id": "org_01",
+      "title": "테스트",
+      "client": "미정",
+      "assignee": "미지정",
+      "updatedAt": "2026-07-04T11:14:41.125Z",
       "status": "interviewing",
-      "completion": 20,
+      "completion": 25,
       "detected": {
-        "platform": "모바일 전용 어플리케이션",
-        "user_count": "200~250명",
-        "core_features": [
-          "AI 녹취/텍스트 변환",
+        "projectOverview": "TM CRM 앱 개발",
+        "targetUsers": "200~250명 규모의 TM 마케터 부서",
+        "mainFeatures": [
+          "AI를 이용한 통화 녹취 및 텍스트 변환",
           "일정 관리",
+          "고객 관리",
           "고객 정보 관리",
           "영업 관리",
           "영업 분석",
@@ -22,155 +76,77 @@
           "통계 및 보고",
           "시스템 관리"
         ],
-        "integration_plan": "추후 웹 CRM과의 연동"
+        "platform": "모바일 전용 어플리케이션",
+        "externalIntegration": "추후 웹 CRM과의 연동 계획"
       },
       "missing": [
         {
-          "title": "Budget and Timeline",
-          "priority": 1
+          "title": "추후 웹 CRM 연동의 구체적인 범위",
+          "priority": 5
         },
         {
-          "title": "Security and Compliance Requirements",
-          "priority": 2
+          "title": "디자인 범위 및 컨셉",
+          "priority": 4
         },
         {
-          "title": "Detailed Feature Specifications",
-          "priority": 3
+          "title": "AI 녹취/텍스트 변환 기능의 구체적인 요구사항",
+          "priority": 4
         },
         {
-          "title": "Specific AI Technology to be Used",
-          "priority": 3
+          "title": "개발 기간",
+          "priority": 4
+        },
+        {
+          "title": "예산",
+          "priority": 4
         }
       ],
       "recommendedQuestions": [
         {
-          "question": "What is the budget and expected timeline for the project?",
-          "reason": "To align the project scope with financial and time constraints.",
-          "priority": 1
+          "question": "웹 CRM과의 연동 시 구체적인 기능 요구사항은 무엇인가요?",
+          "reason": "구체적인 연동 범위에 따라 개발 난이도와 일정이 크게 달라질 수 있습니다.",
+          "priority": 5
         },
         {
-          "question": "What are the security and compliance requirements, especially concerning AI recording features?",
-          "reason": "To ensure adherence to legal and organizational standards.",
-          "priority": 2
+          "question": "디자인은 신규 개발인지, 기존 디자인 활용인지 확인이 필요합니다.",
+          "reason": "디자인 범위에 따라 프로젝트 비용과 일정이 달라질 수 있습니다.",
+          "priority": 4
         },
         {
-          "question": "Could you provide more details on the specific features and functionalities desired?",
-          "reason": "To ensure a comprehensive understanding of all project needs.",
-          "priority": 3
+          "question": "AI 녹취/텍스트 변환 기능에 대한 구체적인 요구사항이 있을까요?",
+          "reason": "AI 관련 기능은 구현 난이도와 기술 스택에 큰 영향을 미칩니다.",
+          "priority": 4
         },
         {
-          "question": "What specific AI technology or providers are preferred for voice recording and text conversion?",
-          "reason": "To determine technical feasibility and potential partnerships.",
-          "priority": 3
+          "question": "프로젝트의 예상 개발 기간은 어떻게 되나요?",
+          "reason": "개발 기간은 프로젝트 계획과 자원 배분에 영향을 줍니다.",
+          "priority": 4
+        },
+        {
+          "question": "예산 범위가 정해진 것이 있다면 알려주세요.",
+          "reason": "예산은 개발 범위와 요구사항의 우선순위를 결정하는 데 중요한 요소입니다.",
+          "priority": 4
         }
       ],
       "source_documents": [],
       "events": [
         {
-          "id": "evt_1783162863980",
+          "id": "evt_1783163672865",
           "type": "quick_memo",
           "title": "텍스트 메모 추가됨",
           "description": "프로젝트 개요 :TM CRM 앱 개발\r\n\r\n200~250명 규모의 TM 마케터 부서에서 사용할 TM CRM 앱이 필요합니다.\r\n개인 모바일로 통화 하는 내용을 AI가 녹취/텍스트 ...",
-          "timestamp": "2026-07-04T11:01:03.980Z"
+          "timestamp": "2026-07-04T11:14:32.865Z"
         },
         {
-          "id": "evt_ai_1783162869987",
+          "id": "evt_ai_1783163681125",
           "type": "ai_analysis",
           "title": "AI 분석 완료",
           "description": "새로운 소스를 바탕으로 대시보드와 공고문이 업데이트되었습니다.",
-          "timestamp": "2026-07-04T11:01:09.987Z",
-          "impact": "진행도 20%"
+          "timestamp": "2026-07-04T11:14:41.125Z",
+          "impact": "진행도 25%"
         }
       ],
-      "draft": "We are seeking a development team for a mobile-exclusive TM CRM application designed for a department of 200-250 telemarketing marketers. The app must include AI-based features to record and convert phone conversation to text. Core functionalities should encompass basic mobile CRM capabilities like scheduling, customer management, sales management, sales analysis, customer service and support, statistics and reporting, system administration, and integration with a future web CRM. Please note the need for potential integration plans and address how these might be synchronized across platforms."
-    },
-    {
-      "project_id": "proj_1783154496920",
-      "org_id": "org_01",
-      "title": "테스트",
-      "client": "미정",
-      "assignee": "이상민",
-      "updatedAt": "2026-07-04T08:41:43.513Z",
-      "status": "interviewing",
-      "completion": 30,
-      "detected": {
-        "platform": {
-          "web": true,
-          "mobile": true,
-          "mobileApp": false
-        },
-        "features": [
-          "쿠폰 발급·보관·사용",
-          "마이페이지 쿠폰 관리",
-          "쿠폰 발급 프로모션 페이지",
-          "소셜 로그인 유지",
-          "영문 번역 및 로컬라이징"
-        ],
-        "adminFeatures": [
-          "유저별 쿠폰 관리",
-          "프로모션 관리",
-          "유저–관리자 웹 API 개발",
-          "이메일·푸시 알림 발송"
-        ],
-        "integration": {
-          "iHerb Impact.com": true,
-          "Partnerize": true
-        },
-        "development": {
-          "풀스택 개발자/개발사 필요": true,
-          "다국어 처리 경험 우대": true
-        }
-      },
-      "missing": [
-        {
-          "title": "예상 완공 날짜",
-          "priority": 1
-        },
-        {
-          "title": "세부 예산 할당",
-          "priority": 2
-        },
-        {
-          "title": "영문 번역에 대한 구체적인 작업 범위",
-          "priority": 1
-        }
-      ],
-      "recommendedQuestions": [
-        {
-          "question": "프로젝트의 예상 완료 기간은 어떻게 되나요?",
-          "reason": "프로젝트 일정을 명확히 하기 위해.",
-          "priority": 1
-        },
-        {
-          "question": "예산은 어느 정도로 책정되어 있나요?",
-          "reason": "프로젝트 비용 관리를 위해.",
-          "priority": 2
-        },
-        {
-          "question": "영문 번역 및 로컬라이징 작업의 구체적인 범위는 무엇인가요?",
-          "reason": "번역 작업의 명확한 범위를 정의하기 위해.",
-          "priority": 1
-        }
-      ],
-      "source_documents": [],
-      "events": [
-        {
-          "id": "evt_1783154496925",
-          "type": "quick_memo",
-          "title": "텍스트 메모 추가됨",
-          "description": "프로젝트 개요\r\n아이허브(iHerb) 제휴 연동을 기반으로 한 쿠폰(프로모션 할인코드) 관리 기능 추가 및 약알 웹페이지 영문 번역 작업입니다. 아이허브에서 제공하는 프로모션 할인...",
-          "timestamp": "2026-07-04T08:41:36.925Z"
-        },
-        {
-          "id": "evt_ai_1783154503513",
-          "type": "ai_analysis",
-          "title": "AI 분석 완료",
-          "description": "새로운 소스를 바탕으로 대시보드와 공고문이 업데이트되었습니다.",
-          "timestamp": "2026-07-04T08:41:43.513Z",
-          "impact": "진행도 30%"
-        }
-      ],
-      "draft": "We are seeking a full-stack developer or development company, including freelancers, for a project involving the integration with iHerb's promotional coupon system, based on partnerships with impact.com and Partnerize. The project aims to add coupon management features to the existing Yakal platform and translate/localize the web services into English. Key tasks include developing a responsive web solution for both PC and mobile platforms (excluding mobile applications at this stage), building a coupon issuance and management system for users, and managing promotions. Ideal candidates will have experience with commerce coupon systems and multilingual i18n processes."
+      "draft": "# TM CRM 앱 개발 프로젝트\n\n## 프로젝트 개요\nTM 마케터 부서에서 사용할 모바일 전용 CRM 앱 개발 프로젝트입니다. AI 기반의 통화 녹취 및 텍스트 변환 기능을 포함하여 다양한 CRM 기능을 제공합니다.\n\n## 프로젝트 배경 및 목표\n템포러리 마케팅(TeleMarketing) 분야의 효율성을 높이기 위해 개발됩니다. 기존에 활용중인 CRM이 없기에 전용 솔루션 구축이 필요합니다.\n\n## 과업 범위\n- 모바일 전용 CRM 앱 개발\n- AI 기반 통화 녹취 및 텍스트 변환 기능 구현\n- 일정 관리, 고객 관리, 고객 정보 관리, 영업 관리, 영업 분석, 고객 서비스 및 지원, 통계 및 보고, 시스템 관리 등의 기능 개발\n- 추후 웹 CRM과의 연동 계획\n\n## 상세 기능 요구사항\n- AI 녹취/텍스트 변환 기능\n- 통계 및 보고 기능\n- 다양한 관리 기능\n\n## 관리자 기능\n논의 필요\n\n## 비기능 요구사항\n논의 필요\n\n## 기술 스택\n논의 필요\n\n## 클라이언트 준비사항\n- 관련 데이터 및 접근 권한\n- 기존 시스템과의 연동에 필요한 정보\n\n## 지원 자격\n- CRM 앱 개발 경험자\n- AI 통합 프로젝트 경험자 우대\n\n## 우대 사항\n- TM 분야 경험자\n- 모바일 앱 최적화 경험자\n\n## 산출물\n- 설치 가능한 모바일 앱\n- 시스템 디자이너 및 개발 문서\n\n## 계약 특이사항\n논의 필요"
     },
     {
       "project_id": "proj_001",

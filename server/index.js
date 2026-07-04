@@ -105,7 +105,18 @@ app.post('/api/projects/:id/upload', upload.single('file'), async (req, res) => 
     eventTitle = `${req.file.originalname} 업로드됨`;
     
     // Basic PDF Parsing
-    if (req.file.mimetype === 'application/pdf') {
+    if (req.file.mimetype.includes('audio')) {
+      try {
+        const transcription = await openai.audio.transcriptions.create({
+          file: fs.createReadStream(req.file.path),
+          model: 'whisper-1',
+        });
+        newText = transcription.text;
+      } catch (e) {
+        console.error("Whisper API error", e);
+        newText = "오디오 텍스트 변환에 실패했습니다.";
+      }
+    } else if (req.file.mimetype === 'application/pdf') {
       const dataBuffer = fs.readFileSync(req.file.path);
       try {
         const parsedData = await pdfParse(dataBuffer);
@@ -116,7 +127,7 @@ app.post('/api/projects/:id/upload', upload.single('file'), async (req, res) => 
     } else if (req.file.mimetype.includes('text') || req.file.mimetype === 'application/json') {
       newText = fs.readFileSync(req.file.path, 'utf8');
     } else {
-      newText = "Audio/Image file uploaded. (Transcription processing skipped in MVP backend)";
+      newText = "지원하지 않는 파일 형식입니다.";
     }
     
     // cleanup temp file
@@ -202,6 +213,28 @@ app.delete('/api/projects/:id', (req, res) => {
   data.projects.splice(idx, 1);
   writeData(data);
   res.json({ success: true });
+});
+
+// UPDATE status
+app.patch('/api/projects/:id/status', (req, res) => {
+  const data = readData();
+  const project = data.projects.find(p => p.project_id === req.params.id);
+  if (!project) return res.status(404).json({ error: 'Not found' });
+  
+  const oldStatus = project.status;
+  project.status = req.body.status;
+  project.updatedAt = new Date().toISOString();
+  
+  project.events.push({
+    id: `evt_status_${Date.now()}`,
+    type: 'status_change',
+    title: `상태 변경: ${req.body.status}`,
+    description: `상태가 ${oldStatus}에서 ${req.body.status}(으)로 변경되었습니다.`,
+    timestamp: project.updatedAt
+  });
+  
+  writeData(data);
+  res.json(project);
 });
 
 app.listen(port, () => {
