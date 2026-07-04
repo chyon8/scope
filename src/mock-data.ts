@@ -2,7 +2,11 @@ import type { ProjectModel, TimelineEvent } from './types'
 
 export const mockProject: ProjectModel = {
   project_id: 'proj_001',
-  org_id: 'org_001',
+  org_id: 'org_01',
+  title: 'TM CRM 앱 및 관리자 웹 신규 구축',
+  client: '(주)한국통신영업',
+  assignee: '장수룡',
+  updatedAt: '2026-07-04T10:16:30Z',
   status: 'interviewing',
   completion: 68,
   detected: {
@@ -82,6 +86,66 @@ export const mockProject: ProjectModel = {
 - 예산: (확인 필요)
 - 일정: (확인 필요)`
 }
+
+export const mockProjects: ProjectModel[] = [
+  mockProject,
+  {
+    project_id: 'proj_002',
+    org_id: 'org_01',
+    title: '아이허브 제휴 연동 쿠폰 시스템',
+    client: '약알(Yak-al)',
+    assignee: '이상민',
+    updatedAt: '2026-07-03T15:20:00Z',
+    status: 'ready',
+    completion: 100,
+    detected: { service: '커머스', 플랫폼: '웹' },
+    missing: [],
+    recommendedQuestions: [],
+    source_documents: []
+  },
+  {
+    project_id: 'proj_003',
+    org_id: 'org_01',
+    title: '유저 테스트용 웹앱 프로토타입 제작',
+    client: '스타트업 A',
+    assignee: '김세민',
+    updatedAt: '2026-07-04T09:00:00Z',
+    status: 'new',
+    completion: 0,
+    detected: {},
+    missing: [],
+    recommendedQuestions: [],
+    source_documents: []
+  },
+  {
+    project_id: 'proj_004',
+    org_id: 'org_01',
+    title: '요양병원 B2B 커머스 플랫폼',
+    client: '(주)휴먼스코리아',
+    assignee: '김세민',
+    updatedAt: '2026-06-25T11:00:00Z',
+    status: 'won',
+    completion: 100,
+    detected: { service: 'B2B 커머스' },
+    missing: [],
+    recommendedQuestions: [],
+    source_documents: []
+  },
+  {
+    project_id: 'proj_005',
+    org_id: 'org_01',
+    title: '쇼핑몰 리뉴얼',
+    client: '스타일브랜드',
+    assignee: '장수룡',
+    updatedAt: '2026-06-20T14:30:00Z',
+    status: 'lost',
+    completion: 80,
+    detected: { service: '쇼핑몰' },
+    missing: [],
+    recommendedQuestions: [],
+    source_documents: []
+  }
+]
 
 export const mockTimelineEvents: TimelineEvent[] = [
   {

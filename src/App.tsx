@@ -1,11 +1,19 @@
 import { useState } from 'react'
 import Workspace from './Workspace'
+import KanbanBoard from './KanbanBoard'
+import { mockProjects } from './mock-data'
+import type { ProjectModel } from './types'
 import './App.css'
 
-type Page = 'workspace' | 'landing'
+type Page = 'kanban' | 'workspace' | 'landing'
 
 function App() {
-  const [page, setPage] = useState<Page>('workspace')
+  const [page, setPage] = useState<Page>('kanban')
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
+
+  const activeProject = activeProjectId 
+    ? mockProjects.find(p => p.project_id === activeProjectId) 
+    : undefined
 
   return (
     <div className="app">
@@ -32,8 +40,19 @@ function App() {
       </nav>
 
       {/* ── Page Content ── */}
-      {page === 'workspace' ? (
-        <Workspace />
+      {page === 'kanban' ? (
+        <KanbanBoard 
+          projects={mockProjects} 
+          onProjectClick={(id) => {
+            setActiveProjectId(id)
+            setPage('workspace')
+          }} 
+        />
+      ) : page === 'workspace' ? (
+        <Workspace 
+          project={activeProject || mockProjects[0]} 
+          onBack={() => setPage('kanban')} 
+        />
       ) : (
         <main className="main-content">
           {/* Landing page content preserved but not default */}

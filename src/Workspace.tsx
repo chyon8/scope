@@ -42,8 +42,13 @@ function getEventIcon(type: TimelineEvent['type']) {
   }
 }
 
-export default function Workspace() {
-  const [project, setProject] = useState<ProjectModel>(() => ({ ...mockProject }))
+interface WorkspaceProps {
+  project: ProjectModel
+  onBack: () => void
+}
+
+export default function Workspace({ project: initialProject, onBack }: WorkspaceProps) {
+  const [project, setProject] = useState<ProjectModel>(() => ({ ...initialProject }))
   const [events, setEvents] = useState<TimelineEvent[]>(() => [...mockTimelineEvents])
   const [memoValue, setMemoValue] = useState('')
   const [isDragging, setIsDragging] = useState(false)
@@ -156,10 +161,13 @@ export default function Workspace() {
       {/* ── Project Header ── */}
       <header className="project-header">
         <div className="project-header__left">
-          <h1 className="project-header__title">TM CRM 프로젝트 명세서 작성</h1>
+          <button className="btn btn-secondary btn-icon" onClick={onBack} title="전체 프로젝트로 돌아가기">
+            ←
+          </button>
+          <h1 className="project-header__title">{project.title}</h1>
           <span className={`project-header__status project-header__status--${project.status === 'ready_for_output' ? 'ready' : project.status}`}>
             <span className="project-header__status-dot" />
-            {getStatusLabel(project.status)}
+            {getStatusLabel(project.status as any)}
           </span>
         </div>
         <div className="project-header__right">

@@ -27,10 +27,16 @@ export interface RecommendedQuestion {
   priority: number
 }
 
+export type ProjectStatus = 'new' | 'interviewing' | 'ready' | 'won' | 'lost'
+
 export interface ProjectModel {
   project_id: string
   org_id: string
-  status: 'collecting' | 'interviewing' | 'ready_for_output'
+  title: string
+  client: string
+  assignee: '장수룡' | '이상민' | '김세민' | '미지정'
+  updatedAt: string
+  status: ProjectStatus
   completion: number // 0-100
   detected: DetectedInfo
   missing: MissingInfo[]
