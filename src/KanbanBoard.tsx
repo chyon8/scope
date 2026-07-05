@@ -1,7 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, forwardRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import type { ProjectModel, ProjectStatus } from './types'
 import './KanbanBoard.css'
+
+const CustomDateInput = forwardRef(({ value, onClick }: any, ref: any) => (
+  <button 
+    onClick={onClick} 
+    ref={ref} 
+    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+  >
+    📅 {value || '기간 선택'}
+  </button>
+))
 
 const COLUMNS: { id: ProjectStatus, title: string }[] = [
   { id: 'inspection', title: '검수' },
@@ -30,8 +42,8 @@ export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [dateFilter, setDateFilter] = useState('all')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [startDate, endDate] = dateRange
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list')
@@ -151,8 +163,8 @@ export default function KanbanBoard() {
     let matchesDate = true
     if (dateFilter === 'custom') {
       const projectDate = new Date(p.updatedAt).getTime()
-      const start = startDate ? new Date(startDate).getTime() : 0
-      const end = endDate ? new Date(endDate).getTime() : Infinity
+      const start = startDate ? startDate.getTime() : 0
+      const end = endDate ? endDate.getTime() : Infinity
       // Add 24 hours to end date to include the whole day
       matchesDate = projectDate >= start && projectDate <= (end === Infinity ? Infinity : end + 86400000)
     } else if (dateFilter !== 'all') {
@@ -215,11 +227,16 @@ export default function KanbanBoard() {
             <option value="custom">직접 지정</option>
           </select>
           {dateFilter === 'custom' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }} />
-              <span style={{ color: 'var(--color-muted)' }}>~</span>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }} />
-            </div>
+            <DatePicker
+              selectsRange={true}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) => setDateRange(update)}
+              isClearable={true}
+              dateFormat="yyyy.MM.dd"
+              customInput={<CustomDateInput />}
+              withPortal
+            />
           )}
           <select 
             value={assigneeFilter}
