@@ -388,7 +388,7 @@ export default function Workspace() {
               onClick={() => { setSelectedMeetingId(null); setMeetingDetail(null); }}
               style={{ padding: '12px', border: selectedMeetingId === null ? '1px solid var(--color-primary)' : '1px solid var(--color-border)', borderRadius: '8px', marginBottom: '24px', cursor: 'pointer', background: selectedMeetingId === null ? 'var(--color-surface-hover)' : 'var(--color-surface)' }}
             >
-              <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-ink)' }}>📊 히스토리 보기</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--color-ink)' }}>📊 모집단계 통합 대시보드</div>
             </div>
 
             <h2 className="sidebar__heading">개발사 사전 미팅 기록</h2>
@@ -431,102 +431,162 @@ export default function Workspace() {
       {/* ── Main Feed (Timeline) OR Dashboard (Middle Panel) ── */}
       <div className="timeline-panel" style={{ backgroundColor: 'var(--color-surface)', overflowY: 'auto' }}>
         {activeTab === 'recruitment' ? (
-          <div className="recruitment-dashboard" style={{ padding: 'var(--space-xl)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 className="preview-panel__heading" style={{ marginBottom: 0 }}>📊 모집 단계 통합 대시보드</h2>
-              <button className="btn btn-secondary" style={{ fontSize: '13px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', borderRadius: '4px', cursor: 'pointer' }} onClick={() => alert('위시켓 최신 데이터 동기화 기능은 연동 예정입니다.')}>
-                🔄 최신 데이터 동기화
-              </button>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
-              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>예산</div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.budget}</div>
-              </div>
-              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>일정</div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.schedule}</div>
-              </div>
-              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>정부지원사업</div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? 'var(--color-primary)' : 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? '대상 (O)' : '해당 없음'}</div>
-              </div>
-              <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>주요 라벨</div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-ink)', display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  {MOCK_RECRUITMENT_DASHBOARD.meta.labels.map(l => <span key={l} style={{ background: 'var(--color-canvas)', padding: '2px 6px', borderRadius: '4px' }}>{l}</span>)}
+          <div style={{ padding: 'var(--space-xl)' }}>
+            {selectedMeetingId === null ? (
+              <div className="recruitment-dashboard">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <h2 className="preview-panel__heading" style={{ marginBottom: 0 }}>📊 모집 단계 통합 대시보드</h2>
+                  <button className="btn btn-secondary" style={{ fontSize: '13px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', borderRadius: '4px', cursor: 'pointer' }} onClick={() => alert('위시켓 최신 데이터 동기화 기능은 연동 예정입니다.')}>
+                    🔄 최신 데이터 동기화
+                  </button>
                 </div>
-              </div>
-            </div>
 
-            <div style={{ padding: '16px', backgroundColor: 'rgba(204, 120, 92, 0.1)', borderRadius: '8px', color: 'var(--color-primary)', fontWeight: 600, fontSize: '14px', marginBottom: '20px' }}>
-              🗣️ 담당 매니저 한줄 요약: {MOCK_RECRUITMENT_DASHBOARD.managerComment}
-            </div>
-            
-            <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>주요 이슈</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
-              {MOCK_RECRUITMENT_DASHBOARD.issues.map((issue, idx) => (
-                <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-ink)' }}>{issue.title}</span>
-                    <span style={{ fontSize: '11px', background: 'var(--color-canvas)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 }}>{issue.source}</span>
+                {meetings.length === 0 && (
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-surface-hover)', borderRadius: '8px', color: 'var(--color-ink)', fontWeight: 500, fontSize: '14px', marginBottom: '24px', textAlign: 'center', border: '1px dashed var(--color-border)' }}>
+                    아직 진행된 미팅이 없습니다. 후보자 미팅을 시작해보세요!
                   </div>
-                  <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--color-body)' }}>{issue.content}</div>
+                )}
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>예산</div>
+                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.budget}</div>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>일정</div>
+                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.schedule}</div>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>정부지원사업</div>
+                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? 'var(--color-primary)' : 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.meta.govSupport ? '대상 (O)' : '해당 없음'}</div>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '4px' }}>주요 라벨</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-ink)', display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                      {MOCK_RECRUITMENT_DASHBOARD.meta.labels.map(l => <span key={l} style={{ background: 'var(--color-canvas)', padding: '2px 6px', borderRadius: '4px' }}>{l}</span>)}
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-              <div>
-                <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>개발사 적합도 랭킹 (AI)</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {MOCK_RECRUITMENT_DASHBOARD.ranking.map((rank, idx) => (
-                    <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold', color: idx === 0 ? 'var(--color-primary)' : 'var(--color-muted)' }}>{idx + 1}</div>
-                      <div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)' }}>{rank.name} <span style={{ color: 'var(--color-primary)', fontSize: '13px', marginLeft: '4px' }}>({rank.score}%)</span></div>
-                        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px', lineHeight: 1.4 }}>{rank.reason}</div>
+                <div style={{ padding: '16px', backgroundColor: 'rgba(204, 120, 92, 0.1)', borderRadius: '8px', color: 'var(--color-primary)', fontWeight: 600, fontSize: '14px', marginBottom: '20px' }}>
+                  🗣️ 담당 매니저 한줄 요약: {MOCK_RECRUITMENT_DASHBOARD.managerComment}
+                </div>
+                
+                <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>주요 이슈</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+                  {MOCK_RECRUITMENT_DASHBOARD.issues.map((issue, idx) => (
+                    <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-ink)' }}>{issue.title}</span>
+                        <span style={{ fontSize: '11px', background: 'var(--color-canvas)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 }}>{issue.source}</span>
                       </div>
+                      <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--color-body)' }}>{issue.content}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <div>
+                    <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>개발사 적합도 랭킹 (AI)</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {MOCK_RECRUITMENT_DASHBOARD.ranking.map((rank, idx) => (
+                        <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                          <div style={{ fontSize: '24px', fontWeight: 'bold', color: idx === 0 ? 'var(--color-primary)' : 'var(--color-muted)' }}>{idx + 1}</div>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ink)' }}>{rank.name} <span style={{ color: 'var(--color-primary)', fontSize: '13px', marginLeft: '4px' }}>({rank.score}%)</span></div>
+                            <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px', lineHeight: 1.4 }}>{rank.reason}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>모집 퍼널</h3>
+                    <div style={{ padding: '24px 16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.views}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>조회수</div>
+                      </div>
+                      <div style={{ color: 'var(--color-hairline)' }}>→</div>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.applications}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>지원</div>
+                      </div>
+                      <div style={{ color: 'var(--color-hairline)' }}>→</div>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.meetings}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>미팅</div>
+                      </div>
+                      <div style={{ color: 'var(--color-hairline)' }}>→</div>
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-primary)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.shortlisted}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-primary)', marginTop: '4px', fontWeight: 500 }}>선정</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>개발사 Q&A</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {MOCK_RECRUITMENT_DASHBOARD.qna.map((q, idx) => (
+                    <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px' }}>
+                      <div style={{ fontWeight: 600, fontSize: '14px', color: '#b5651d', marginBottom: '8px' }}>Q. {q.question}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--color-muted)' }}>{q.partner} · {q.phase}</div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div>
-                <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>모집 퍼널</h3>
-                <div style={{ padding: '24px 16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.views}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>조회수</div>
-                  </div>
-                  <div style={{ color: 'var(--color-hairline)' }}>→</div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.applications}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>지원</div>
-                  </div>
-                  <div style={{ color: 'var(--color-hairline)' }}>→</div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-ink)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.meetings}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--color-muted)', marginTop: '4px' }}>미팅</div>
-                  </div>
-                  <div style={{ color: 'var(--color-hairline)' }}>→</div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--color-primary)' }}>{MOCK_RECRUITMENT_DASHBOARD.funnel.shortlisted}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--color-primary)', marginTop: '4px', fontWeight: 500 }}>선정</div>
-                  </div>
+            ) : !meetingDetail ? (
+              <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
+                <p style={{ color: 'var(--color-muted)' }}>미팅 정보를 불러오는 중입니다...</p>
+              </div>
+            ) : (
+              <div className="meeting-detail-view" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h2 className="preview-panel__heading" style={{ marginBottom: '8px' }}>미팅 상세 및 AI 분석</h2>
+                
+                <div className="ai-summary-card" style={{ background: 'var(--color-surface-card)', padding: '16px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+                  <h3 style={{ fontSize: '14px', marginBottom: '12px', color: 'var(--color-primary)' }}>✨ AI 미팅 분석</h3>
+                  {meetingDetail.aiSummary ? (
+                    <div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <strong style={{ fontSize: '13px' }}>🚨 개발사 리스크</strong>
+                        <ul style={{ fontSize: '13px', paddingLeft: '20px', margin: '4px 0', lineHeight: 1.5 }}>
+                          {meetingDetail.aiSummary.risks.map((r: string, idx: number) => <li key={idx}>{r}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <strong style={{ fontSize: '13px' }}>💬 주요 Q&A</strong>
+                        {meetingDetail.aiSummary.qna.map((q: any, idx: number) => (
+                          <div key={idx} style={{ fontSize: '13px', background: 'var(--color-canvas)', padding: '10px', borderRadius: '6px', marginTop: '6px' }}>
+                            <div style={{ marginBottom: '4px', fontWeight: 600 }}>Q. {q.question}</div>
+                            <div style={{ color: 'var(--color-muted)' }}>A. {q.answer}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                      <p style={{ fontSize: '13px', color: 'var(--color-muted)', marginBottom: '12px' }}>아직 분석된 데이터가 없습니다.</p>
+                      <button 
+                        className="btn btn-primary" 
+                        onClick={handleAnalyzeMeeting} 
+                        disabled={isAnalyzing}
+                        style={{ fontSize: '12px', padding: '8px 16px', borderRadius: 'var(--rounded-md)' }}
+                      >
+                        {isAnalyzing ? '분석 중...' : 'AI 리스크 추출하기'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="transcript-viewer">
+                  <h3 style={{ fontSize: '14px', marginBottom: '8px', color: 'var(--color-ink)' }}>대화 원본 (Transcript)</h3>
+                  <pre className="preview-panel__text" style={{ minHeight: '300px', fontSize: '13px', lineHeight: 1.6 }}>
+                    {meetingDetail.transcript}
+                  </pre>
                 </div>
               </div>
-            </div>
-
-            <h3 style={{ fontSize: '15px', marginBottom: '12px', fontWeight: 600 }}>개발사 Q&A</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {MOCK_RECRUITMENT_DASHBOARD.qna.map((q, idx) => (
-                <div key={idx} style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-hairline)', borderRadius: '8px' }}>
-                  <div style={{ fontWeight: 600, fontSize: '14px', color: '#b5651d', marginBottom: '8px' }}>Q. {q.question}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-muted)' }}>{q.partner} · {q.phase}</div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
         ) : (
           <>
@@ -644,77 +704,26 @@ export default function Workspace() {
         <aside className="preview-panel" style={{ display: 'flex', flexDirection: 'column' }}>
           <div className="preview-panel__header">
             <h2 className="preview-panel__heading">
-              미팅 상세 및 AI 분석
+              원본 히스토리 보드
             </h2>
           </div>
           <div className="preview-panel__content" style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1, overflowY: 'auto', padding: 'var(--space-md)' }}>
-            {selectedMeetingId === null ? (
-              <div className="history-board" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', margin: 0 }}>원본 히스토리 보드</h3>
-                  <button className="btn btn-primary" style={{ fontSize: '12px', padding: '6px 12px' }} onClick={() => alert('AI 요약 기능은 연동 예정입니다.')}>✨ AI 전체 요약하기</button>
-                </div>
-                {MOCK_WISHKET_HISTORY.map(h => (
-                  <div key={h.id} style={{ background: 'var(--color-surface)', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-hairline)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                      <strong style={{ fontSize: '13px', color: 'var(--color-ink)' }}>{h.author}</strong>
-                      <span style={{ fontSize: '11px', color: 'var(--color-muted)' }}>{h.date}</span>
-                    </div>
-                    <pre style={{ fontSize: '13px', color: 'var(--color-body)', whiteSpace: 'pre-wrap', lineHeight: 1.6, fontFamily: 'inherit', margin: 0 }}>
-                      {h.content}
-                    </pre>
+            <div className="history-board" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '8px' }}>
+                <button className="btn btn-primary" style={{ fontSize: '12px', padding: '6px 12px' }} onClick={() => alert('AI 요약 기능은 연동 예정입니다.')}>✨ AI 전체 요약하기</button>
+              </div>
+              {MOCK_WISHKET_HISTORY.map(h => (
+                <div key={h.id} style={{ background: 'var(--color-surface)', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-hairline)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <strong style={{ fontSize: '13px', color: 'var(--color-ink)' }}>{h.author}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--color-muted)' }}>{h.date}</span>
                   </div>
-                ))}
-              </div>
-            ) : !meetingDetail ? (
-              <div className="empty-tab-view" style={{ border: 'none', margin: 0, padding: 0, background: 'transparent' }}>
-                <p style={{ color: 'var(--color-muted)' }}>좌측에서 미팅을 선택해주세요.</p>
-              </div>
-            ) : (
-              <>
-                <div className="ai-summary-card" style={{ background: 'var(--color-surface-card)', padding: '16px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '14px', marginBottom: '12px', color: 'var(--color-primary)' }}>✨ AI 미팅 분석</h3>
-                  {meetingDetail.aiSummary ? (
-                    <div>
-                      <div style={{ marginBottom: '12px' }}>
-                        <strong style={{ fontSize: '13px' }}>🚨 개발사 리스크</strong>
-                        <ul style={{ fontSize: '13px', paddingLeft: '20px', margin: '4px 0', lineHeight: 1.5 }}>
-                          {meetingDetail.aiSummary.risks.map((r: string, idx: number) => <li key={idx}>{r}</li>)}
-                        </ul>
-                      </div>
-                      <div>
-                        <strong style={{ fontSize: '13px' }}>💬 주요 Q&A</strong>
-                        {meetingDetail.aiSummary.qna.map((q: any, idx: number) => (
-                          <div key={idx} style={{ fontSize: '13px', background: 'var(--color-canvas)', padding: '10px', borderRadius: '6px', marginTop: '6px' }}>
-                            <div style={{ marginBottom: '4px', fontWeight: 600 }}>Q. {q.question}</div>
-                            <div style={{ color: 'var(--color-muted)' }}>A. {q.answer}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                      <p style={{ fontSize: '13px', color: 'var(--color-muted)', marginBottom: '12px' }}>아직 분석된 데이터가 없습니다.</p>
-                      <button 
-                        className="btn btn-primary" 
-                        onClick={handleAnalyzeMeeting} 
-                        disabled={isAnalyzing}
-                        style={{ fontSize: '12px', padding: '8px 16px', borderRadius: 'var(--rounded-md)' }}
-                      >
-                        {isAnalyzing ? '분석 중...' : 'AI 리스크 추출하기'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div className="transcript-viewer">
-                  <h3 style={{ fontSize: '14px', marginBottom: '8px', color: 'var(--color-ink)' }}>대화 원본 (Transcript)</h3>
-                  <pre className="preview-panel__text" style={{ minHeight: '300px', fontSize: '13px', lineHeight: 1.6 }}>
-                    {meetingDetail.transcript}
+                  <pre style={{ fontSize: '13px', color: 'var(--color-body)', whiteSpace: 'pre-wrap', lineHeight: 1.6, fontFamily: 'inherit', margin: 0 }}>
+                    {h.content}
                   </pre>
                 </div>
-              </>
-            )}
+              ))}
+            </div>
           </div>
         </aside>
       ) : (
