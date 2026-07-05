@@ -6,8 +6,27 @@ import './App.css'
 
 function App() {
   const navigate = useNavigate()
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  
+  // Initialize dark mode based on system preference
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
+    return false
+  })
 
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDarkMode(e.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  // Apply theme class to body
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add('dark-theme')
