@@ -30,6 +30,8 @@ export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [dateFilter, setDateFilter] = useState('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list')
@@ -147,7 +149,13 @@ export default function KanbanBoard() {
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter
     
     let matchesDate = true
-    if (dateFilter !== 'all') {
+    if (dateFilter === 'custom') {
+      const projectDate = new Date(p.updatedAt).getTime()
+      const start = startDate ? new Date(startDate).getTime() : 0
+      const end = endDate ? new Date(endDate).getTime() : Infinity
+      // Add 24 hours to end date to include the whole day
+      matchesDate = projectDate >= start && projectDate <= (end === Infinity ? Infinity : end + 86400000)
+    } else if (dateFilter !== 'all') {
       const projectDate = new Date(p.updatedAt)
       const now = new Date()
       const diffTime = Math.abs(now.getTime() - projectDate.getTime())
@@ -199,10 +207,20 @@ export default function KanbanBoard() {
             style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', minWidth: '110px' }}
           >
             <option value="all">전체 기간</option>
+            <option value="1">오늘</option>
+            <option value="7">최근 1주일</option>
             <option value="30">최근 1개월</option>
             <option value="90">최근 3개월</option>
             <option value="180">최근 6개월</option>
+            <option value="custom">직접 지정</option>
           </select>
+          {dateFilter === 'custom' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }} />
+              <span style={{ color: 'var(--color-muted)' }}>~</span>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: '8px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }} />
+            </div>
+          )}
           <select 
             value={assigneeFilter}
             onChange={e => setAssigneeFilter(e.target.value)}
