@@ -2,17 +2,12 @@ import React, { useState, useEffect, useRef, forwardRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { ko } from 'date-fns/locale'
 import type { ProjectModel, ProjectStatus } from './types'
 import './KanbanBoard.css'
 
-const CustomDateInput = forwardRef(({ value, onClick }: any, ref: any) => (
-  <button 
-    onClick={onClick} 
-    ref={ref} 
-    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', whiteSpace: 'nowrap' }}
-  >
-    📅 {value || '기간 선택'}
-  </button>
+const HiddenInput = forwardRef((props: any, ref: any) => (
+  <div ref={ref} style={{ display: 'none' }} />
 ))
 
 const COLUMNS: { id: ProjectStatus, title: string }[] = [
@@ -38,6 +33,11 @@ function getAssigneeColor(assignee: string) {
   }
 }
 
+function formatDateString(date: Date | null) {
+  if (!date) return '';
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+}
+
 export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -56,6 +56,7 @@ export default function KanbanBoard() {
   const [initialFiles, setInitialFiles] = useState<File[]>([])
   const [isCreating, setIsCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const datePickerRef = useRef<any>(null)
   
   const navigate = useNavigate()
 
@@ -215,7 +216,14 @@ export default function KanbanBoard() {
           />
           <select 
             value={dateFilter}
-            onChange={e => setDateFilter(e.target.value)}
+            onChange={e => {
+              setDateFilter(e.target.value)
+              if (e.target.value === 'custom') {
+                setTimeout(() => {
+                  datePickerRef.current?.setOpen(true)
+                }, 10)
+              }
+            }}
             style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', minWidth: '110px' }}
           >
             <option value="all">전체 기간</option>
@@ -226,18 +234,6 @@ export default function KanbanBoard() {
             <option value="180">최근 6개월</option>
             <option value="custom">직접 지정</option>
           </select>
-          {dateFilter === 'custom' && (
-            <DatePicker
-              selectsRange={true}
-              startDate={startDate}
-              endDate={endDate}
-              onChange={(update) => setDateRange(update)}
-              isClearable={true}
-              dateFormat="yyyy.MM.dd"
-              customInput={<CustomDateInput />}
-              withPortal
-            />
-          )}
           <select 
             value={assigneeFilter}
             onChange={e => setAssigneeFilter(e.target.value)}
@@ -262,6 +258,31 @@ export default function KanbanBoard() {
             <option value="cancelled">취소</option>
           </select>
         </div>
+        
+        {dateFilter === 'custom' && (
+          <div style={{ marginTop: '-4px', padding: '0 16px', fontSize: '13px', color: 'var(--color-ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <DatePicker
+              ref={datePickerRef}
+              selectsRange={true}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) => setDateRange(update)}
+              isClearable={true}
+              dateFormat="yyyy.MM.dd"
+              customInput={<HiddenInput />}
+              withPortal
+              locale={ko}
+            />
+            {(startDate || endDate) && (
+              <>
+                <span><strong style={{ color: 'var(--color-primary)' }}>기간 지정:</strong> {formatDateString(startDate)} ~ {formatDateString(endDate)}</span>
+                <button onClick={() => datePickerRef.current?.setOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--color-muted)', cursor: 'pointer', fontSize: '12px', textDecoration: 'underline', padding: 0 }}>
+                  날짜 변경
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </header>
       
       {viewMode === 'kanban' ? (
