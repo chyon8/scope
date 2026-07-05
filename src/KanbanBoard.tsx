@@ -29,6 +29,7 @@ function getAssigneeColor(assignee: string) {
 export default function KanbanBoard() {
   const [projects, setProjects] = useState<ProjectModel[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [dateFilter, setDateFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list')
@@ -145,26 +146,67 @@ export default function KanbanBoard() {
     const matchesAssignee = assigneeFilter === 'all' || p.assignee === assigneeFilter
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter
     
-    return matchesSearch && matchesAssignee && matchesStatus
+    let matchesDate = true
+    if (dateFilter !== 'all') {
+      const projectDate = new Date(p.updatedAt)
+      const now = new Date()
+      const diffTime = Math.abs(now.getTime() - projectDate.getTime())
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      matchesDate = diffDays <= parseInt(dateFilter)
+    }
+
+    return matchesSearch && matchesAssignee && matchesStatus && matchesDate
   })
 
   return (
     <div className="kanban-board">
-      <header className="kanban-header">
-        <h1 className="kanban-header__title">CaseLab 파이프라인</h1>
+      <header className="kanban-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 className="kanban-header__title">CaseLab 파이프라인</h1>
+          <div className="kanban-header__actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', overflow: 'hidden' }}>
+              <button 
+                className={`kanban-view-toggle ${viewMode === 'kanban' ? 'active' : ''}`}
+                onClick={() => setViewMode('kanban')}
+                style={{ padding: '8px 12px', border: 'none', background: viewMode === 'kanban' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'kanban' ? '#fff' : 'var(--color-muted)', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+              >
+                🗂️ 칸반
+              </button>
+              <button 
+                className={`kanban-view-toggle ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                style={{ padding: '8px 12px', border: 'none', background: viewMode === 'list' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'list' ? '#fff' : 'var(--color-muted)', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+              >
+                📋 리스트
+              </button>
+            </div>
+            <button className="btn btn-primary" onClick={openModal}>새 프로젝트 등록</button>
+          </div>
+        </div>
         
-        <div className="kanban-header__search" style={{ display: 'flex', gap: '12px' }}>
+        <div className="kanban-header__filters" style={{ display: 'flex', gap: '12px', padding: '16px', backgroundColor: 'var(--color-canvas)', borderRadius: '8px', border: '1px solid var(--color-hairline)' }}>
           <input 
             type="text" 
             placeholder="프로젝트명 또는 고객사 검색..." 
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="kanban-search-input"
+            style={{ flex: 1 }}
           />
+          <select 
+            value={dateFilter}
+            onChange={e => setDateFilter(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', minWidth: '110px' }}
+          >
+            <option value="all">전체 기간</option>
+            <option value="30">최근 1개월</option>
+            <option value="90">최근 3개월</option>
+            <option value="180">최근 6개월</option>
+          </select>
           <select 
             value={assigneeFilter}
             onChange={e => setAssigneeFilter(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', minWidth: '110px' }}
           >
             <option value="all">담당자 전체</option>
             <option value="장수룡">장수룡</option>
@@ -175,7 +217,7 @@ export default function KanbanBoard() {
           <select 
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)' }}
+            style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', fontSize: '13px', outline: 'none', color: 'var(--color-ink)', minWidth: '110px' }}
           >
             <option value="all">상태 전체</option>
             <option value="inspection">검수</option>
@@ -184,24 +226,6 @@ export default function KanbanBoard() {
             <option value="completed">완료</option>
             <option value="cancelled">취소</option>
           </select>
-        </div>
-
-        <div className="kanban-header__actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', overflow: 'hidden' }}>
-            <button 
-              style={{ padding: '6px 12px', fontSize: '13px', background: viewMode === 'kanban' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'kanban' ? 'white' : 'var(--color-ink)', border: 'none', cursor: 'pointer' }}
-              onClick={() => setViewMode('kanban')}
-            >
-              🗂️ 칸반
-            </button>
-            <button 
-              style={{ padding: '6px 12px', fontSize: '13px', background: viewMode === 'list' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'list' ? 'white' : 'var(--color-ink)', border: 'none', cursor: 'pointer' }}
-              onClick={() => setViewMode('list')}
-            >
-              📋 리스트
-            </button>
-          </div>
-          <button className="btn btn-primary" onClick={openModal}>새 프로젝트 등록</button>
         </div>
       </header>
       
